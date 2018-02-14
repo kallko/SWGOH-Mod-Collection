@@ -4,7 +4,9 @@ created by Andrij Kalko
 
 
 git clone
+
 npm install
+
 npm start
 
 Open in browser http://localhost:9021
