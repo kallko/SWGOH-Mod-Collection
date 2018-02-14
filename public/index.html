@@ -1,108 +1,44 @@
-<link rel="stylesheet" href="./css/seaBattles.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.10/angular.js"></script>
-<script type="text/javascript" src="./js/controllers/view-game-controller.js"></script>
-<script type="text/javascript" src="./js/controllers/socket-controller.js"></script>
+<script type="text/javascript" src="./js/controllers/view-model-controller.js"></script>
 
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>The greate SEA BATTLE</title>
+    <title>ZIP CODE</title>
 
 </head>
 <body>
 
 
-  <div ng-app="seaBattle">
-      <div ng-controller = "socketController">
-         Game #{{gameId}} ACTION {{message}}
+  <div ng-app="GermanZip">
+      <div ng-controller = "viewModelController">
+          <div style="float: left; width: 50%">
+              <div ng-repeat  = "city in generalData | orderBy : 'cityName' track by $index">
+                    {{city.cityName}}
+                  <select ng-model = "selectedDistrict">
+                        <option ng-repeat = "district in city.districts" value="{{district.zip}}">
+                            {{district.zip}}
+                        </option>
 
-      </div>
-      <br>
-      <div ng-controller = "viewGameController">
-        <div>
-            <div>
-                    SEA FLEET
-
-                <span>
-                    <table class="float-table" >
-                        <thead class="main-table">
-                            <tr>
-                                <th></th>
-                                <th> A </th>
-                                <th> B </th>
-                                <th> C </th>
-                                <th> D </th>
-                                <th> E </th>
-                                <th> F </th>
-                                <th> G </th>
-                                <th> H </th>
-                                <th> J </th>
-                                <th> K </th>
-                            </tr>
-                        </thead>
-                        <tbody class="main-table" >
-                            <tr ng-repeat="row in main_table.rows">
-                                <td>{{row.key}}</td>
-                                <td ng-repeat = "block in row.row track by $index"> {{getImage(block)}} </td>
-                            </tr>
-                        </tbody>
-
-                    </table>
-
-                </span>
-            </div>
-            <br>
-            <br>
-            <br>
-
-            <span>
-                    ENEMY FLEET
-
-                <span>
-                    <table class="float-table" >
-                        <thead class="main-table">
-                            <tr>
-                                <th></th>
-                                <th> A </th>
-                                <th> B </th>
-                                <th> C </th>
-                                <th> D </th>
-                                <th> E </th>
-                                <th> F </th>
-                                <th> G </th>
-                                <th> H </th>
-                                <th> J </th>
-                                <th> K </th>
-                            </tr>
-                        </thead>
-                        <tbody class="main-table" >
-                            <tr ng-repeat="row in enemy_table.rows" ng-click="shooting($event, row.key)">
-                                <td>{{row.key}}</td>
-                                 <td ng-repeat = "block in row.row track by $index"> {{getImage(block)}} </td>
-                            </tr>
-                        </tbody>
-
-                    </table>
-
-                </span>
-            </span>
-
-
-        </div>
-
-          <div class="history">
-
-              ACTION HISTORY
-              <div ng-repeat="action in history">
-                  {{getAction(action.next_move == id, action.kind)}} {{getTarget(action.index)}} {{action.row}} {{getResult(action.kind)}}
+                  </select>
+                  <button ng-click = "selectDistrictForDetails(selectedDistrict)">DETAILS</button>
+              </div>
+          </div>
+          <div style="margin-left: 51%">
+             {{greetings}}. {{generalData.length}} from {{collectionSize}}
+              <br><br>
+              <div ng-show = districtDetail>
+                  {{districtDetail.city}} zip: {{districtDetail.zip}} lat: {{districtDetail.lat}} lon: {{districtDetail.lon}}
+              </div>
+              <br>
+              <div ng-repeat = "nearDistrict in details">
+                  {{nearDistrict.zip}} {{nearDistrict.city}} distance to {{districtDetail.city}}({{districtDetail.zip}}) - {{nearDistrict.distance}} meters
               </div>
           </div>
       </div>
-
-
   </div>
 
 </body>

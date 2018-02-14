@@ -1,2 +1,1 @@
-
-angular.module('seaBattle',[]);
+angular.module('GermanZip',[]);
