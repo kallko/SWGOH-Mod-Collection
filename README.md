@@ -1,4 +1,4 @@
-# German Zip Codes test Task
+# German Zip Codes test Task for medialesson.de
 NodeJS + Socket + Angular
 created by Andrij Kalko
 
