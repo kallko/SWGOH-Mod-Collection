@@ -2,17 +2,17 @@ const express = require('express'),
     app = express(),
     server = require('http').Server(app),
     request = require("request"),
-    io = require('socket.io')(server);
-
+    io = require('socket.io')(server),
+    util = require('util'),
+    html2json = require('html2json').html2json;
 
 app.use(express.static(__dirname + '/public'));
-
+let Schemas = require('./public/connector/mongo-connector');
 const router = require('./server/serverRouter'),
       port = 9021,
       CreateViewModels = require('./server/createViewModels');
 
 
-const url = "http://www.fa-technik.adfc.de/code/opengeodb/PLZ.tab";
 
 console.log(new Date());
 
@@ -22,39 +22,98 @@ server.listen(port);
 console.info('Listening on port ' + (port) + '...\n');
 const cvm = new CreateViewModels();
 
-let generalData,
-    parsedData;
+const setsProps = [
+    {name : "Speed", quant : 4, bonus: 5,maxBonus: 10 },
+    {name : "Health", quant : 2, bonus: 2.5, maxBonus: 5 },
+    {name : "Offense", quant : 4, bonus: 5, maxBonus: 10 },
+    {name : "Tenacity", quant : 2, bonus: 2.5, maxBonus: 5 },
+    {name : "Defense", quant : 2, bonus: 2.5, maxBonus: 5 },
+    {name : "Protection", quant : 0, bonus: 0, maxBonus: 0 },
+    {name : "Critical Chance", quant : 2, bonus: 2.5, maxBonus: 5 },
+    {name : "Potency", quant : 2, bonus: 5, maxBonus: 10 },
+    {name : "Critical Damage", quant : 4, bonus: 15, maxBonus: 30 },
+];
 
-//receive data from url
-request(url, function (error, response, body) {
-    if (!error) {
-        parsedData = customParser(body);
-        generalData = cvm.createGeneralModel(parsedData);
-        //generalData.data.length = 70; //for development
-    } else {
-        console.log("ERROR " + error);
-    }
-});
+
+
+
+let mods,
+    parsedMods = [],
+    errorsdMods = [],
+    units,
+    generalData,
+    bigData = {},
+    parsedData,
+    heroes = [],
+    heroesCollection = [];
+
+
+loadAllHeroes();
+
+
 
 
 io.on('connection', function (socket) {
 
-           console.log("New connection");
 
-           if (generalData) {
-               //send to client info about size of collection
-               socket.emit("size", generalData.data.length - 1);
 
-               let firstSendData = {};
-               firstSendData.data = [];
-               for (let i = 0; i < 5; i++){
-                   firstSendData.data.push(generalData.data[i]);
-               }
-               socket.emit('generalData', firstSendData);
+    console.log("New connection");
 
-           } else {
-               console.log("General Data NOT ready");
-           }
+    socket.on('newUserData', function(login){
+
+        if (bigData[login] && bigData[login].finished) {
+            socket.emit("heroes", bigData[login])
+
+        } else {
+
+            if (bigData[login] &&  bigData[login].started) {
+                return;
+            } else {
+                bigData[login] = {};
+                bigData[login].started = true;
+                loadDataForNewUser(login, socket);
+            }
+
+
+
+        }
+    });
+
+
+
+
+    if(units) {
+        console.log("Send UNIT");
+        socket.emit("units", units)
+    }
+
+
+    if(mods) {
+        console.log("Send MODS" , mods);
+        socket.emit("mods", mods)
+    }
+
+    socket.on('newHero', function (data) {
+        console.log(data.name + "___" + data.class);
+        let toSave = new Schemas.units({
+           "name" : data.name,
+            "class" : data.class
+        });
+        console.log("to Save HERO", toSave);
+        toSave.save()
+    });
+
+
+    socket.on('newMod', function (data) {
+        console.log("New Mod to save", data);
+        let toSave = new Schemas.mods({
+            form: data.form,
+            set: data.set,
+            main: data.main,
+            speed: data.speed
+        });
+        toSave.save()
+    });
 
     //we send information in parts
     socket.on('partReceived', function(size){
@@ -143,6 +202,405 @@ function findNextObjectStartChar (simpleString){
 }
 
 
+function loadAllHeroes() {
+    let url = "https://swgoh.gg";
+
+    request(url, function (error, response, body) {
+        if (!error) {
+
+            let preData = html2json(body);
+            //console.log("All right", JSON.stringify(preData));
+            let i = 0;
+            while (preData.child[1].child[3].child[15].child[3].child[3].child[1].child[i] !== undefined) {
+
+                let hero = {};
+
+                if (preData.child[1].child[3].child[15].child[3].child[3].child[1].child[i].attr &&
+                    preData.child[1].child[3].child[15].child[3].child[3].child[1].child[i].attr.class &&
+                    preData.child[1].child[3].child[15].child[3].child[3].child[1].child[i].attr.class.some(clas => clas === 'character')) {
+
+
+                     hero.name = preData.child[1].child[3].child[15].child[3].child[3].child[1].child[i].child[1].child[3].child[3].child[0].text;
+                     hero.speed = preData.child[1].child[3].child[15].child[3].child[3].child[1].child[i].child[1].child[7].child[5].child[0].text;
+                     hero.health = preData.child[1].child[3].child[15].child[3].child[3].child[1].child[i].child[1].child[7].child[3].child[0].text;
+                     hero.damage = preData.child[1].child[3].child[15].child[3].child[3].child[1].child[i].child[1].child[7].child[6].child[1].child[0].text;
+
+                     heroesCollection.push(hero);
+                }
+                i++;
+            }
+        }
+        console.log("heroesCollection LOADED");
+    })
+
+}
+
+
+function loadDataForNewUser(login, socket) {
+
+
+    let url = "https://swgoh.gg/u/" + login + "/collection/";
+
+    request(url, function (error, response, body) {
+        if (!error) {
+
+            //console.log(JSON.stringify(body));
+            //body =
+            if (body.indexOf('Not Found') !== -1) {
+                socket.emit('notLogin');
+                return;
+            }
+
+
+            //todo {"node":"element","tag":"div","attr":{"class":["col-xs-6","col-sm-3","col-md-3","col-lg-2"]} - begin string with pers
+            // parsedData = customParser(body);
+            // generalData = cvm.createGeneralModel(parsedData);
+            //generalData.data.length = 70; //for development
+            let preData = html2json(body);
+
+            let block = preData.child[1].child[3].child[15].child[3].child[3].child[1].child[5].child[1];
+            let i = 0;
+            let lastError  = 0;
+
+            while (block.child[i] !== undefined) {
+                let hero = {};
 
 
 
+                if (block.child[i].child){
+
+                    //console.log("HERO ", JSON.stringify(block.child[i]));
+
+                    try {
+
+                        hero.name =     block.child[i].child[1].child[5].child[0].child[0].text;
+                        hero.maxPower = block.child[i].child[1].child[3].attr.title[3];
+                        hero.realPower = block.child[i].child[1].child[3].attr.title[1];
+                        hero.level = block.child[i].child[1].child[1].child[1].child[19].child[0].text;
+                        hero.tir = block.child[i].child[1].child[1].child[1].child[21].child[0].text;
+                        heroes.push(hero);
+                    } catch (e) {
+                        console.log (" ERROR ");
+                        if (lastError !== i) {
+                            lastError = i;
+                            i--;
+                        } else {
+                            i = 500;
+                        }
+                    }
+                }
+                i++;
+            }
+
+        } else {
+            console.log("ERROR " + error);
+        }
+    });
+
+    let modRequestIndex = 0;
+    modeRequest(login, modRequestIndex);
+    let modPreparsed;
+
+
+    async function modeParser(data) {
+        console.log("Mode parser");
+
+        let i = 0;
+        let modsArray = data.child[3].child[15].child[3].child[3].child[1].child[5].child[1];
+        while (modsArray.child[i] !== undefined) {
+            if (modsArray.child[i].attr) {
+                let mod = {};
+                let j = 0;
+
+                while (modsArray.child[i].child[1].child[1].child[3].child[1].child[3].child[j] !== undefined) {
+                    try {
+
+                        let h = 0;
+
+                        if (modsArray.child[i].child[1].child[1].child[1].child[0].child[3].attr.alt[2] === "Crit") {
+                            mod.set =  modsArray.child[i].child[1].child[1].child[1].child[0].child[3].attr.alt[2] + " " + modsArray.child[i].child[1].child[1].child[1].child[0].child[3].attr.alt[3];
+                            mod.forma =  modsArray.child[i].child[1].child[1].child[1].child[0].child[3].attr.alt[4];
+                        } else {
+                            mod.set =  modsArray.child[i].child[1].child[1].child[1].child[0].child[3].attr.alt[2];
+                            mod.forma =  modsArray.child[i].child[1].child[1].child[1].child[0].child[3].attr.alt[3];
+                        }
+
+
+
+                        mod.level = modsArray.child[i].child[1].child[1].child[1].child[0].child[1].child[0].text;
+                        mod.hero =  modsArray.child[i].child[1].child[1].child[1].child[0].child[3].attr.alt[0];
+                        mod.class =  modsArray.child[i].child[1].child[1].child[1].child[0].child[3].attr.alt[1];
+
+                        mod.mainStatValue = modsArray.child[i].child[1].child[1].child[3].child[1].child[1].child[1].child[0].child[0].text;
+                        mod.mainStat = modsArray.child[i].child[1].child[1].child[3].child[1].child[1].child[1].child[2].child[0].text;
+                        //3-5-7
+                        try {
+                            mod.firstStat      = modsArray.child[i].child[1].child[1].child[3].child[1].child[3].child[1].child[3].child[0].text;
+                            mod.firstStatValue = modsArray.child[i].child[1].child[1].child[3].child[1].child[3].child[1].child[1].child[0].text;
+                        } catch (e) {
+                            mod.firstStat      = '';
+                            mod.firstStatValue = '';
+                        }
+
+
+
+                        try {
+                            mod.secondStat      = modsArray.child[i].child[1].child[1].child[3].child[1].child[3].child[3].child[3].child[0].text;
+                            mod.secondStatValue = modsArray.child[i].child[1].child[1].child[3].child[1].child[3].child[3].child[1].child[0].text;
+                        } catch (e) {
+                            mod.secondStat      = '';
+                            mod.secondStatValue = '';
+                        }
+
+
+
+
+                        try {
+                            mod.thirdStat      = modsArray.child[i].child[1].child[1].child[3].child[1].child[3].child[5].child[3].child[0].text;
+                            mod.thirdStatValue = modsArray.child[i].child[1].child[1].child[3].child[1].child[3].child[5].child[1].child[0].text;
+                        } catch (e) {
+                            mod.thirdStat      = '';
+                            mod.thirdStatValue = '';
+                        }
+
+
+
+                        try {
+                            mod.forthStat      = modsArray.child[i].child[1].child[1].child[3].child[1].child[3].child[7].child[3].child[0].text;
+                            mod.forthStatValue = modsArray.child[i].child[1].child[1].child[3].child[1].child[3].child[7].child[1].child[0].text;
+                        } catch (e) {
+                            mod.forthStat      = '';
+                            mod.forthStatValue = '';
+                        }
+
+
+
+                        mod.hero =  modsArray.child[i].child[1].child[1].child[1].child[0].child[2].child[0].attr.title.join(' ');
+
+                    } catch (e) {
+                        mod.hero = modsArray.child[i].child[1].child[1].child[1].child[0].child[2].child[0].attr.title;
+
+                        if (!mod.hero) {
+                            console.log("ERROR in  ", mod.hero = modsArray.child[i].child[1].child[1].child[1].child[0].child[2].child[0].attr);
+                        }
+                        errorsdMods.push(mod);
+                    }
+
+                    // console.log("DATA ", j);
+                    // console.log(JSON.stringify(modsArray.child[i].child[1].child[1].child[3].child[1].child[3].child[j]));
+                    j++;
+                }
+                // i = 10000;
+
+                for (let i = 0; i < setsProps.length; i++){
+                    calculateMod(mod, setsProps[i].name);
+                }
+
+
+                // calculateMod(mod, "Speed");
+                // calculateMod(mod, "Health");
+                // calculateMod(mod, "Offense");
+                // calculateMod(mod, "Tenacity");
+                // calculateMod(mod, "Defense");
+                // calculateMod(mod, "Protection");
+                // calculateMod(mod, "Critical Chance");
+                // calculateMod(mod, "Potency");
+                // calculateMod(mod, "Critical Damage");
+
+                //console.log(i, "MOD => ", mod);
+                parsedMods.push(mod);
+            }
+            i++;
+
+        }
+
+        //console.log(JSON.stringify(errorsdMods))
+    }
+
+
+
+    async function modeRequest(login, i) {
+        //console.log("SEND REQ ", i, parsedMods.length, parsedMods[i * 36 - 1]);
+        //https://swgoh.gg/u/dominnique/mods/
+
+        let url = 'https://swgoh.gg/u/' + login + '/mods/?page=' + (++i);
+        request(url, function (error, response, body) {
+
+            if (!error) {
+                //console.log("received ModData ", body);
+                if (body.indexOf('Not Found') === -1) {
+                    modRequestIndex++;
+                    modPreparsed  = html2json(body);
+                    modeParser(modPreparsed.child[1]);
+                    modeRequest(login, modRequestIndex);
+                } else {
+                    console.log("WHOLE MODS", parsedMods.length);
+
+                    joinModsAndUnits(parsedMods, heroes);
+                    bigData[login].heroes = heroes;
+                    bigData[login].finished = true;
+                    calculateSets(heroes);
+                    socket.emit("heroes", heroes)
+                    //console.log(JSON.stringify(parsedMods));
+                }
+                //generalData.data.length = 70; //for development
+            } else {
+                console.log("ERROR " + error);
+
+            }
+        });
+    }
+
+
+    function joinModsAndUnits(mods, units) {
+        //console.log("Heroes", units);
+        mods.forEach(mod => {
+            let hero = units.find(unit => unit.name === mod.hero);
+            if (hero) {
+                hero[mod.forma] = mod;
+            } else {
+                console.log(" HERO Not FINDED ", mod.hero)
+            }
+
+
+        });
+
+        console.log("JOIN FINISHED");
+        //calculateSets(units);
+    }
+}
+
+
+
+function calculateMod (mod, field) {
+    let name = "add" + field.toString();
+    mod[name] = 0;
+    mod[name + "Percent"] = 0;
+    for (let key in mod) {
+        //console.log("mod[key] ", mod[key], "field ", field);
+        if (mod[key] === field && key.length > 3) {
+                let newKey = key.toString().substring(0, key.toString().length - 4);
+                if (mod[newKey + "StatValue"] && mod[newKey + "StatValue"].indexOf(".") !== -1) {
+                    mod[name + "Percent"] += parseFloat(mod[newKey + "StatValue"]);
+                } else {
+                    mod[name] += parseInt(mod[newKey + "StatValue"]);
+                }
+
+
+
+        }
+    }
+
+}
+
+
+function calculateSets(units) {
+    if (heroesCollection && heroesCollection.length > 0 ){
+
+        for (let i = 0; i < units.length; i++) {
+            let unit = units[i];
+
+                let hero = heroesCollection.find(her => her.name = unit.name);
+                unit.speed = hero.speed;
+                unit.health = hero.health;
+                unit.damage = hero.damage;
+
+                   for (let key in unit) {
+                        if (unit[key].set){
+                            let newKey = '';
+
+                            if (unit[key].level === '15') {
+                                newKey = unit[key].set + "MaxSet"
+                            } else {
+                                newKey = unit[key].set + "Set"
+                            }
+
+
+                            if (unit[newKey]) {
+                                unit[newKey]++
+                            } else {
+                                unit[newKey] = 1;
+                            }
+
+
+                        }
+                    }
+
+
+
+        }
+
+
+
+    }
+
+
+}
+//receive data from url
+// request(url, function (error, response, body) {
+//     if (!error) {
+//         parsedData = customParser(body);
+//         generalData = cvm.createGeneralModel(parsedData);
+//         //generalData.data.length = 70; //for development
+//     } else {
+//         console.log("ERROR " + error);
+//     }
+// });
+
+
+
+
+// setTimeout(() => {
+//     Schemas.mods.collection.find({}).toArray(function(err, result) {
+//
+//     if (err) throw err;
+//     console.log(result);
+//     mods = result;
+// });
+//
+//
+//
+//     Schemas.units.collection.find({}).toArray(function(err, result) {
+//
+//         if (err) throw err;
+//         console.log(result);
+//         units = result
+//     });
+//     }, 500);
+
+
+// //receive data from url
+// url = 'https://swgoh.gg/u/kalko/mods/';
+// request(url, function (error, response, body) {
+//     if (!error) {
+//         console.log("MODS.first");
+//         //generalData.data.length = 70; //for development
+//     } else {
+//         console.log("ERROR " + error);
+//     }
+// });
+//
+// url = 'https://swgoh.gg/u/kalko/mods/?page=12';
+// request(url, function (error, response, body) {
+//     if (!error) {
+//         console.log("MODS.second ", body);
+//         //generalData.data.length = 70; //for development
+//     } else {
+//         console.log("ERROR " + error);
+//     }
+// });
+
+// if (generalData) {
+//     //send to client info about size of collection
+//     socket.emit("size", generalData.data.length - 1);
+//
+//     let firstSendData = {};
+//     firstSendData.data = [];
+//     for (let i = 0; i < 5; i++){
+//         firstSendData.data.push(generalData.data[i]);
+//     }
+//     socket.emit('generalData', firstSendData);
+//
+// } else {
+//     console.log("General Data NOT ready");
+// }

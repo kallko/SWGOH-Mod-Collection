@@ -7,7 +7,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ZIP CODE</title>
+    <title>STAR WARS MODE MANAGEMENT</title>
 
 </head>
 <body>
@@ -15,29 +15,86 @@
 
   <div ng-app="GermanZip">
       <div ng-controller = "viewModelController">
-          <div style="float: left; width: 50%">
-              <div ng-repeat  = "city in generalData | orderBy : 'cityName' track by $index">
-                    {{city.cityName}}
-                  <select ng-model = "selectedDistrict">
-                        <option ng-repeat = "district in city.districts" value="{{district.zip}}">
-                            {{district.zip}}
-                        </option>
-
-                  </select>
-                  <button ng-click = "selectDistrictForDetails(selectedDistrict)">DETAILS</button>
-              </div>
-          </div>
-          <div style="margin-left: 51%">
-             {{greetings}}. {{generalData.length}} from {{collectionSize}}
-              <br><br>
-              <div ng-show = districtDetail>
-                  {{districtDetail.city}} zip: {{districtDetail.zip}} lat: {{districtDetail.lat}} lon: {{districtDetail.lon}}
+          <div>
+              <div>
+                  <input type="text" ng-model="user">
+                  <button ng-click = "loadNewData()"> LOAD </button>
               </div>
               <br>
-              <div ng-repeat = "nearDistrict in details">
-                  {{nearDistrict.zip}} {{nearDistrict.city}} distance to {{districtDetail.city}}({{districtDetail.zip}}) - {{nearDistrict.distance}} meters
+              <div>
+                  MANAGE UNITS
+                  <select ng-model = "selectedHero">
+                      <option ng-repeat = "hero in heroes" value="{{hero.name}}">
+                      {{hero.name}}
+                      </option>
+                  </select>
+                  <input type="text" ng-model="newName">
+                  <button ng-show = "newName.length > 0 " ng-click = "createNewUnit()">
+                      CREATE
+                  </button>
+                  <button ng-show = "selectedHero.length > 0" ng-click = "deleteOldUnit()">
+                      DELETE
+                  </button>
               </div>
+              <br>
+              <div>
+                  CREATE NEW MOD:
+                  FORM <select ng-model = "selectedForm" ng-change = "changeModFilter()">
+                      <option ng-repeat = "form in modForms" value="{{form}}">
+                          {{form}}
+                      </option>
+                  </select>
+                  SET <select ng-model = "selectedSet">
+                      <option ng-repeat = "set in modSets" value="{{set}}">
+                          {{set}}
+                      </option>
+                  </select>
+                  MAIN <select ng-model = "selectedMain">
+                      <option ng-repeat = "main in modSets" value="{{main}}">
+                          {{main}}
+                      </option>
+                   </select>
+                  STARS
+                  <input type="number" min = "1" max="5" ng-model="stars">
+                  SPEED
+                  <input type="number" min = "0" max="30" ng-model="additionalSpeed">
+                  <button ng-show = "selectedForm && selectedSet && selectedMain && additionalSpeed" ng-click = "createNewMod()">
+                      CREATE
+                  </button>
+                  <!--<button ng-show = "selectedHero.length > 0" ng-click = "deleteOldUnit()">-->
+                      <!--DELETE-->
+                  <!--</button>-->
+              </div>
+
           </div>
+          <div ng-repeat = "mod in myMods">
+              {{mod.form}} -- {{mod.set}} -- {{mod.main}}
+
+          </div>
+
+          <!--<div style="float: left; width: 50%">-->
+              <!--<div ng-repeat  = "city in generalData | orderBy : 'cityName' track by $index">-->
+                    <!--{{city.cityName}}-->
+                  <!--<select ng-model = "selectedDistrict">-->
+                        <!--<option ng-repeat = "district in city.districts" value="{{district.zip}}">-->
+                            <!--{{district.zip}}-->
+                        <!--</option>-->
+
+                  <!--</select>-->
+                  <!--<button ng-click = "selectDistrictForDetails(selectedDistrict)">DETAILS</button>-->
+              <!--</div>-->
+          <!--</div>-->
+          <!--<div style="margin-left: 51%">-->
+             <!--{{greetings}}. {{generalData.length}} from {{collectionSize}}-->
+              <!--<br><br>-->
+              <!--<div ng-show = districtDetail>-->
+                  <!--{{districtDetail.city}} zip: {{districtDetail.zip}} lat: {{districtDetail.lat}} lon: {{districtDetail.lon}}-->
+              <!--</div>-->
+              <!--<br>-->
+              <!--<div ng-repeat = "nearDistrict in details">-->
+                  <!--{{nearDistrict.zip}} {{nearDistrict.city}} distance to {{districtDetail.city}}({{districtDetail.zip}}) - {{nearDistrict.distance}} meters-->
+              <!--</div>-->
+          <!--</div>-->
       </div>
   </div>
 
