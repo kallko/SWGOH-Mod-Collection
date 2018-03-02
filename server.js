@@ -23,15 +23,15 @@ console.info('Listening on port ' + (port) + '...\n');
 const cvm = new CreateViewModels();
 
 const setsProps = [
-    {name : "Speed", quant : 4, bonus: 5,maxBonus: 10 },
-    {name : "Health", quant : 2, bonus: 2.5, maxBonus: 5 },
-    {name : "Offense", quant : 4, bonus: 5, maxBonus: 10 },
-    {name : "Tenacity", quant : 2, bonus: 2.5, maxBonus: 5 },
-    {name : "Defense", quant : 2, bonus: 2.5, maxBonus: 5 },
-    {name : "Protection", quant : 0, bonus: 0, maxBonus: 0 },
-    {name : "Critical Chance", quant : 2, bonus: 2.5, maxBonus: 5 },
-    {name : "Potency", quant : 2, bonus: 5, maxBonus: 10 },
-    {name : "Critical Damage", quant : 4, bonus: 15, maxBonus: 30 },
+    {name : "Speed", count : 4, bonus: 5, maxBonus: 10 },
+    {name : "Health", count : 2, bonus: 2.5, maxBonus: 5 },
+    {name : "Offense", count : 4, bonus: 5, maxBonus: 10 },
+    {name : "Tenacity", count : 2, bonus: 2.5, maxBonus: 5 },
+    {name : "Defense", count : 2, bonus: 2.5, maxBonus: 5 },
+    {name : "Protection", count : 0, bonus: 0, maxBonus: 0 },
+    {name : "Crit Chance", count : 2, bonus: 2.5, maxBonus: 5 },
+    {name : "Potency", count : 2, bonus: 5, maxBonus: 10 },
+    {name : "Crit Damage", count : 4, bonus: 15, maxBonus: 30 },
 ];
 
 
@@ -480,7 +480,7 @@ function calculateMod (mod, field) {
         //console.log("mod[key] ", mod[key], "field ", field);
         if (mod[key] === field && key.length > 3) {
                 let newKey = key.toString().substring(0, key.toString().length - 4);
-                if (mod[newKey + "StatValue"] && mod[newKey + "StatValue"].indexOf(".") !== -1) {
+                if ((mod[newKey + "StatValue"] && mod[newKey + "StatValue"].indexOf(".") !== -1) || key === "mainStat") {
                     mod[name + "Percent"] += parseFloat(mod[newKey + "StatValue"]);
                 } else {
                     mod[name] += parseInt(mod[newKey + "StatValue"]);
@@ -525,6 +525,95 @@ function calculateSets(units) {
 
                         }
                     }
+
+                    unit.mods = [];
+
+                    for (let key in unit) {
+                       if (unit[key].set) {
+                           unit.mods.push(unit[key]);
+                           delete unit[key];
+                       }
+                    }
+
+                    for (let i = 0; i < unit.mods.length; i++) {
+                     let mod = unit.mods[i];
+
+                        for (let key in mod) {
+                            if (key.indexOf("add") === 0 && mod[key] > 0){
+
+                                if (unit[key]) {
+                                    unit[key] += mod[key];
+                                } else {
+                                    unit[key] = mod[key];
+                                }
+
+                            }
+
+                        }
+
+
+                    }
+
+
+                    if (unit.name === "Talia") {
+
+                        console.log("TALIA addDefensePercent ", unit.addDefensePercent );
+                        for (let key in unit) {
+
+                            console.log("KEY - ", key);
+
+                            unit.checked = true;
+
+                            let setName = '';
+
+                            if (key.indexOf("Set") !== -1 && key.indexOf("MaxSet") === -1) {
+
+                                //console.log("WORK with ", key);
+
+                                let additionalKey = key.replace("Set", "MaxSet");
+                                let setName = key.replace("Set", '');
+
+                                //console.log(additionalKey, "&&&&& ", setName);
+
+                                let set = setsProps.find(setProp => setProp.name === setName);
+
+                                if (unit[additionalKey]) {
+                                    let maxBonus = set.maxBonus * (Math.floor(unit[additionalKey]/set.count));
+
+                                   // unit["maxBonus" + setName] = maxBonus;
+
+                                    unit["add" + setName + "Percent"] += maxBonus;
+                                    unit[additionalKey] -= Math.floor(unit[additionalKey]/set.count) * set.count;
+                                    unit[key] += unit[additionalKey];
+                                }
+
+                                let bonus = set.bonus * (Math.floor(unit[key]/set.count));
+                                unit["add" + setName + "Percent"] += bonus;
+
+
+
+
+                            } else {
+
+                                let additionalKey = key.replace("MaxSet", "Set");
+
+                                //console.log("ELSE KEY ", key, " additional key ", additionalKey);
+
+                                if (key.indexOf("MaxSet") !== -1 && !unit[additionalKey]) {
+
+                                   //console.log("GO IN HEALTH");
+
+                                    let setName = key.replace("MaxSet", '');
+
+
+                                    let set = setsProps.find(setProp => setProp.name === setName);
+                                    let maxBonus = set.maxBonus * (Math.floor(unit[key]/set.count));
+                                    unit["add" + setName + "Percent"] += maxBonus;
+                                }
+                            }
+                        }
+                    }
+
 
 
 
