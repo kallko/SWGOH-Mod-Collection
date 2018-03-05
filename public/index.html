@@ -19,56 +19,61 @@
               <div>
                   <input type="text" ng-model="user">
                   <button ng-click = "loadNewData()"> LOAD </button>
+                  <button ng-click = "adminTest()"> admin </button>
               </div>
               <br>
-              <div>
-                  MANAGE UNITS
-                  <select ng-model = "selectedHero">
-                      <option ng-repeat = "hero in heroes" value="{{hero.name}}">
-                      {{hero.name}}
-                      </option>
-                  </select>
-                  <input type="text" ng-model="newName">
-                  <button ng-show = "newName.length > 0 " ng-click = "createNewUnit()">
-                      CREATE
-                  </button>
-                  <button ng-show = "selectedHero.length > 0" ng-click = "deleteOldUnit()">
-                      DELETE
-                  </button>
-              </div>
-              <br>
-              <div>
-                  CREATE NEW MOD:
-                  FORM <select ng-model = "selectedForm" ng-change = "changeModFilter()">
-                      <option ng-repeat = "form in modForms" value="{{form}}">
-                          {{form}}
-                      </option>
-                  </select>
-                  SET <select ng-model = "selectedSet">
-                      <option ng-repeat = "set in modSets" value="{{set}}">
-                          {{set}}
-                      </option>
-                  </select>
-                  MAIN <select ng-model = "selectedMain">
-                      <option ng-repeat = "main in modSets" value="{{main}}">
-                          {{main}}
-                      </option>
-                   </select>
-                  STARS
-                  <input type="number" min = "1" max="5" ng-model="stars">
-                  SPEED
-                  <input type="number" min = "0" max="30" ng-model="additionalSpeed">
-                  <button ng-show = "selectedForm && selectedSet && selectedMain && additionalSpeed" ng-click = "createNewMod()">
-                      CREATE
-                  </button>
+              <!--<div>-->
+                  <!--MANAGE UNITS-->
+                  <!--<select ng-model = "selectedHero">-->
+                      <!--<option ng-repeat = "hero in heroes" value="{{hero.name}}">-->
+                      <!--{{hero.name}}-->
+                      <!--</option>-->
+                  <!--</select>-->
+                  <!--<input type="text" ng-model="newName">-->
+                  <!--<button ng-show = "newName.length > 0 " ng-click = "createNewUnit()">-->
+                      <!--CREATE-->
+                  <!--</button>-->
                   <!--<button ng-show = "selectedHero.length > 0" ng-click = "deleteOldUnit()">-->
                       <!--DELETE-->
                   <!--</button>-->
-              </div>
+              <!--</div>-->
+              <br>
+              <!--<div>-->
+                  <!--CREATE NEW MOD:-->
+                  <!--FORM <select ng-model = "selectedForm" ng-change = "changeModFilter()">-->
+                      <!--<option ng-repeat = "form in modForms" value="{{form}}">-->
+                          <!--{{form}}-->
+                      <!--</option>-->
+                  <!--</select>-->
+                  <!--SET <select ng-model = "selectedSet">-->
+                      <!--<option ng-repeat = "set in modSets" value="{{set}}">-->
+                          <!--{{set}}-->
+                      <!--</option>-->
+                  <!--</select>-->
+                  <!--MAIN <select ng-model = "selectedMain">-->
+                      <!--<option ng-repeat = "main in modSets" value="{{main}}">-->
+                          <!--{{main}}-->
+                      <!--</option>-->
+                   <!--</select>-->
+                  <!--STARS-->
+                  <!--<input type="number" min = "1" max="5" ng-model="stars">-->
+                  <!--SPEED-->
+                  <!--<input type="number" min = "0" max="30" ng-model="additionalSpeed">-->
+                  <!--<button ng-show = "selectedForm && selectedSet && selectedMain && additionalSpeed" ng-click = "createNewMod()">-->
+                      <!--CREATE-->
+                  <!--</button>-->
+                  <!--&lt;!&ndash;<button ng-show = "selectedHero.length > 0" ng-click = "deleteOldUnit()">&ndash;&gt;-->
+                      <!--&lt;!&ndash;DELETE&ndash;&gt;-->
+                  <!--&lt;!&ndash;</button>&ndash;&gt;-->
+              <!--</div>-->
 
           </div>
-          <div ng-repeat = "mod in myMods">
-              {{mod.form}} -- {{mod.set}} -- {{mod.main}}
+
+          MODS CAN BE UPGRADED WITH SPEED + :
+          <br>
+          <br>
+          <div ng-repeat = "mod in needUpgradeMods">
+             {{$index + 1}} {{mod.forma}} -- {{mod.set}} -- {{mod.hero}} -- {{mod.level}} level  -- {{mod.mainStat === "Speed" ? "MAIN GOAL" : ""}}
 
           </div>
 

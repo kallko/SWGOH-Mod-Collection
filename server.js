@@ -38,13 +38,13 @@ const setsProps = [
 
 
 let mods,
-    parsedMods = [],
+    //parsedMods = [],
     errorsdMods = [],
     units,
     generalData,
     bigData = {},
     parsedData,
-    heroes = [],
+    //heroes = [],
     heroesCollection = [];
 
 
@@ -62,6 +62,7 @@ io.on('connection', function (socket) {
     socket.on('newUserData', function(login){
 
         if (bigData[login] && bigData[login].finished) {
+            console.log("DATA ALREADY CREATED ", login);
             socket.emit("heroes", bigData[login])
 
         } else {
@@ -71,6 +72,7 @@ io.on('connection', function (socket) {
             } else {
                 bigData[login] = {};
                 bigData[login].started = true;
+                bigData[login].mods = [];
                 loadDataForNewUser(login, socket);
             }
 
@@ -103,6 +105,17 @@ io.on('connection', function (socket) {
         toSave.save()
     });
 
+
+    socket.on('admin', function () {
+
+        for (let key in bigData) {
+            console.log(key);
+            console.log("Heroes ", bigData[key].heroes.length);
+            console.log("Mods ", bigData[key].mods.length);
+            console.log("Collection ", bigData[key].collection.length);
+        }
+
+    });
 
     socket.on('newMod', function (data) {
         console.log("New Mod to save", data);
@@ -251,7 +264,7 @@ function loadDataForNewUser(login, socket) {
                 return;
             }
 
-
+            bigData[login].heroes = [];
             //todo {"node":"element","tag":"div","attr":{"class":["col-xs-6","col-sm-3","col-md-3","col-lg-2"]} - begin string with pers
             // parsedData = customParser(body);
             // generalData = cvm.createGeneralModel(parsedData);
@@ -278,7 +291,7 @@ function loadDataForNewUser(login, socket) {
                         hero.realPower = block.child[i].child[1].child[3].attr.title[1];
                         hero.level = block.child[i].child[1].child[1].child[1].child[19].child[0].text;
                         hero.tir = block.child[i].child[1].child[1].child[1].child[21].child[0].text;
-                        heroes.push(hero);
+                        bigData[login].heroes.push(hero);
                     } catch (e) {
                         console.log (" ERROR ");
                         if (lastError !== i) {
@@ -302,7 +315,9 @@ function loadDataForNewUser(login, socket) {
     let modPreparsed;
 
 
-    async function modeParser(data) {
+    async function modeParser(data, login) {
+
+
         console.log("Mode parser");
 
         let i = 0;
@@ -408,7 +423,7 @@ function loadDataForNewUser(login, socket) {
                 // calculateMod(mod, "Critical Damage");
 
                 //console.log(i, "MOD => ", mod);
-                parsedMods.push(mod);
+                bigData[login].mods.push(mod);
             }
             i++;
 
@@ -431,17 +446,22 @@ function loadDataForNewUser(login, socket) {
                 if (body.indexOf('Not Found') === -1) {
                     modRequestIndex++;
                     modPreparsed  = html2json(body);
-                    modeParser(modPreparsed.child[1]);
+                    modeParser(modPreparsed.child[1], login);
                     modeRequest(login, modRequestIndex);
                 } else {
-                    console.log("WHOLE MODS", parsedMods.length);
 
-                    joinModsAndUnits(parsedMods, heroes);
-                    bigData[login].heroes = heroes;
-                    bigData[login].finished = true;
-                    calculateSets(heroes);
-                    socket.emit("heroes", heroes)
-                    //console.log(JSON.stringify(parsedMods));
+                    if (bigData[login].mods && bigData[login].mods.length > 0 && bigData[login].heroes && bigData[login].heroes.length > 0) {
+                        joinModsAndUnits(bigData[login].mods, bigData[login].heroes);
+
+                        bigData[login].collection = heroesCollection;
+                        bigData[login].finished = true;
+                        calculateSets(bigData[login].heroes);
+
+
+                        socket.emit("heroes", bigData[login]);
+                    }
+
+
                 }
                 //generalData.data.length = 70; //for development
             } else {

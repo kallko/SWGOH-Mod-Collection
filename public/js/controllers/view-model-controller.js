@@ -14,6 +14,8 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     vm.additionalSpeed = 0;
     vm.stars = 1;
     vm.user;
+    vm.needUpgradeMods = [];
+    vm.admin = false;
 
     let allMods = [];
     let currentUser = localStorage.getItem('currentUser');
@@ -22,6 +24,9 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     socket = io.connect('http://localhost:9021');
 
     console.log("CURRENT USER ", currentUser);
+
+    vm.admin = currentUser === " kalko";
+
     if (currentUser) {
         socket.emit('newUserData', currentUser);
     }
@@ -72,16 +77,29 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
        alert("BAD LOGIN");
     });
 
-    socket.on('units', function (data) {
-        vm.heroes = data;
-        vm.$apply();
-        console.log(vm.heroes)
-    });
+    // socket.on('units', function (data) {
+    //     vm.heroes = data.heroes;
+    //     vm.mods = data.mods;
+    //     vm.heroesCollection = data.heroesCollection;
+    //     vm.$apply();
+    //     console.log(vm.heroes)
+    // });
 
     socket.on('heroes', function (data) {
-        vm.heroes = data;
+            vm.heroes = data.heroes;
+            vm.mods = data.mods;
+            vm.heroesCollection = data.collection;
+            vm.heroes.forEach(hero => hero.name = hero.name.replace(/&quot;/g, '\"'));
+            vm.mods.forEach(mod => mod.hero = mod.hero.replace(/&quot;/g, '\"'));
+            vm.heroesCollection.forEach(hero => hero.name = hero.name.replace(/&quot;/g, '\"'));
+
+
         vm.$apply();
         console.log("RECEIVED ", vm.heroes);
+        console.log("RECEIVED ", vm.mods);
+        console.log("RECEIVED ", vm.heroesCollection);
+
+        showNeedUpgradeMods(vm.mods)
     });
 
 
@@ -152,9 +170,39 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     };
 
     vm.loadNewData = function () {
+        vm.needUpgradeMods = [];
         currentUser = vm.user;
+        console.log("user ", currentUser);
         localStorage.setItem('currentUser', currentUser);
         socket.emit('newUserData', currentUser);
+    };
+
+
+    vm.adminTest = function () {
+     socket.emit("admin");
+    };
+
+    function showNeedUpgradeMods(mods) {
+      //vm.needUpgradeMods = mods.filter(mod => isSpeedReceiver(mod));
+      vm.needUpgradeMods = mods.filter(mod => isSpeedReceiver(mod) || haveAdditionalSpeed(mod));
+       console.log("mods for upgrade ", vm.needUpgradeMods);
+       // let secondLineMods = mods.filter(mod => (parseInt(mod.level) < 3 ));
+       // vm.needUpgradeMods = vm.needUpgradeMods.concat(secondLineMods);
+       //  console.log("needUpgradeMods ", vm.needUpgradeMods);
+
+        vm.$apply();
     }
 
+function isSpeedReceiver(mod) {
+        return mod.forma === "Receiver" && parseInt(mod.level) < 15 && mod.mainStat === "Speed";
+}
+
+function haveAdditionalSpeed(mod) {
+    return  (parseInt(mod.level) < 3 && mod.firstStat === "Speed") ||
+            (parseInt(mod.level) < 6 && (mod.firstStat === "Speed" || mod.secondStat === "Speed")) ||
+            (parseInt(mod.level) < 9 && (mod.firstStat === "Speed" || mod.secondStat === "Speed" || mod.thirdStat === "Speed")) ||
+            (parseInt(mod.level) < 12 && (mod.firstStat === "Speed" || mod.secondStat === "Speed"|| mod.thirdStat === "Speed" || mod.forthStat === "Speed"))
+}
 }]);
+
+//&& mod.firstStat !== ""
