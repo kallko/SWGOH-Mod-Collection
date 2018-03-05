@@ -446,8 +446,15 @@ function loadDataForNewUser(login, socket) {
                 if (body.indexOf('Not Found') === -1) {
                     modRequestIndex++;
                     modPreparsed  = html2json(body);
-                    modeParser(modPreparsed.child[1], login);
-                    modeRequest(login, modRequestIndex);
+
+
+                    if (modPreparsed.child[1]) {
+                        modeParser(modPreparsed.child[1], login);
+                        modeRequest(login, modRequestIndex);
+                    } else {
+                        socket.emit('errorSWOGH');
+                    }
+
                 } else {
 
                     if (bigData[login].mods && bigData[login].mods.length > 0 && bigData[login].heroes && bigData[login].heroes.length > 0) {
