@@ -6,7 +6,7 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     vm.greetings = "Wait for data loading";
     vm.newName = "";
     vm.selectedDistrict;
-    vm.selectedHero;
+    vm.selectedHero = '';
     vm.collectionSize = 0;
     vm.selectedForm = '';
     vm.selectedSet = '';
@@ -16,17 +16,46 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     vm.user;
     vm.needUpgradeMods = [];
     vm.admin = false;
+    vm.viewModel = 0;
+    vm.bestMods = [];
+    // vm.selectedSecondSet;
+    // vm.selectedFirstdSet;
+
+
+    vm.setsProps = [
+        {name : "Speed", count : 4, bonus: 5, maxBonus: 10 },
+        {name : "Health", count : 2, bonus: 2.5, maxBonus: 5 },
+        {name : "Offense", count : 4, bonus: 5, maxBonus: 10 },
+        {name : "Tenacity", count : 2, bonus: 2.5, maxBonus: 5 },
+        {name : "Defense", count : 2, bonus: 2.5, maxBonus: 5 },
+        {name : "Protection", count : 0, bonus: 0, maxBonus: 0 },
+        {name : "Crit Chance", count : 2, bonus: 2.5, maxBonus: 5 },
+        {name : "Potency", count : 2, bonus: 5, maxBonus: 10 },
+        {name : "Crit Damage", count : 4, bonus: 15, maxBonus: 30 },
+        {name : "Accuracy", count : 0, bonus: 0, maxBonus: 0 },
+        {name : "Crit Avoidance", count : 0, bonus: 0, maxBonus: 0 }
+    ];
+
+    const modForma = [
+        "Holo-Array",
+        "Transmitter",
+        "Data-Bus",
+        "Receiver",
+        "Multiplexer",
+        "Processor"
+    ];
+
 
     let allMods = [];
     let currentUser = localStorage.getItem('currentUser');
     // localStorage.setItem('currentUser', vm.gameId);
 
-    socket = io.connect('http://93.183.200.136:9021');
-    //socket = io.connect('http://localhost:9021');
+    //socket = io.connect('http://93.183.200.136:9021');
+    socket = io.connect('http://localhost:9021');
 
     console.log("CURRENT USER ", currentUser);
 
-    vm.admin = currentUser === " kalko";
+    vm.admin = currentUser === "kalko";
 
     if (currentUser) {
         socket.emit('newUserData', currentUser);
@@ -37,7 +66,7 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     ];
 
     vm.modForms = ["arrow", "square", "rhombus", "triangle", "circle", "cross"];
-    vm.modSets = ["health", "defence", "k-damage", "k-chance", "resistance", "offence", "efficient", "speed"];
+    vm.modSets = ["health", "defence", "c-damage", "c-chance", "resistance", "offence", "efficient", "speed"];
     vm.myMods = [];
 
 
@@ -74,9 +103,72 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
         socket.emit('newMod', newMod);
     };
 
+    vm.findNeedUpgradeMods = function () {
+        vm.viewModel = 1;
+        showNeedUpgradeMods(vm.mods);
+        vm.$apply();
+    };
+
+    vm.findBestMods = function () {
+        vm.viewModel = 2;
+        vm.bestMods = [];
+        let tempMMods = [].concat(vm.mods);
+        for (let i in modForma) {
+            let maxSpeed = 0;
+            let bestMod = [];
+            tempMMods.forEach(mod => {
+
+                if (mod.forma === modForma[i] && mod.addSpeed === maxSpeed) {
+                    bestMod.push(mod)
+                }
+
+                if (mod.forma === modForma[i] && mod.addSpeed > maxSpeed) {
+                    bestMod = bestMod.filter(best => best.forma !== modForma[i]);
+
+                    maxSpeed = mod.addSpeed;
+                    bestMod.push(mod);
+                }
+
+
+
+            });
+
+            console.log(modForma[i], " ", bestMod.length);
+            vm.bestMods = vm.bestMods.concat(bestMod);
+            console.log(vm.bestMods.length);
+        }
+        console.log(vm.viewModel, "BestMods ", vm.bestMods);
+    };
+
+
+
+    vm.modsConstructor = function () {
+        console.log("Constructor mode");
+        vm.unFrezedHeroes = [].concat(vm.heroes);
+        vm.frezedHeroes = [];
+        vm.viewModel = 3;
+    };
+
+
+    vm.frezeHero = function (name) {
+         console.log("name", name);
+         let hero = vm.unFrezedHeroes.find(hero => hero.name === name);
+         vm.frezedHeroes.push(hero);
+         vm.unFrezedHeroes = vm.unFrezedHeroes.filter(hero => hero.name !== name);
+
+    };
+
     socket.on('notLogin', function () {
        alert("BAD LOGIN");
     });
+
+    vm.unFrezeHero = function (name) {
+        let hero = vm.frezedHeroes.find(fHero => fHero.name === name);
+        vm.unFrezedHeroes.push(hero);
+        vm.frezedHeroes = vm.frezedHeroes.filter(fHero => fHero.name !== name);
+
+    };
+
 
     // socket.on('units', function (data) {
     //     vm.heroes = data.heroes;
@@ -94,13 +186,13 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
             vm.mods.forEach(mod => mod.hero = mod.hero.replace(/&quot;/g, '\"'));
             vm.heroesCollection.forEach(hero => hero.name = hero.name.replace(/&quot;/g, '\"'));
 
-
+        vm.viewModel = 1;
         vm.$apply();
         console.log("RECEIVED ", vm.heroes);
         console.log("RECEIVED ", vm.mods);
         console.log("RECEIVED ", vm.heroesCollection);
 
-        showNeedUpgradeMods(vm.mods)
+
     });
 
 
@@ -175,8 +267,10 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     };
 
     vm.loadNewData = function () {
+        vm.viewModel  = 0;
         vm.needUpgradeMods = [];
         currentUser = vm.user;
+        vm.admin = currentUser === "kalko";
         console.log("user ", currentUser);
         localStorage.setItem('currentUser', currentUser);
         socket.emit('newUserData', currentUser);
@@ -184,7 +278,12 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
 
 
     vm.adminTest = function () {
-     socket.emit("admin");
+        console.log(vm.selectedFirstdSet, vm.selectedSecondSet, vm.selectedThirdSet, vm.selectedMain);
+        socket.emit("admin");
+    };
+
+    vm.filterProps = function (item) {
+        return item.count > 0;
     };
 
     function showNeedUpgradeMods(mods) {

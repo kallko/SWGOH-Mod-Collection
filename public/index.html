@@ -19,89 +19,173 @@
               <div>
                   <input type="text" ng-model="user">
                   <button ng-click = "loadNewData()"> LOAD </button>
-                  <button ng-click = "adminTest()"> admin </button>
+                  <button ng-click = "adminTest()" ng-show = "admin"> admin </button>
+                  <br>
+                  <br>
+                  <button ng-click = "findNeedUpgradeMods()" ng-show = "mods.length > 0"> need Upgrade </button>
+                  <button ng-click = "findBestMods()" ng-show = "mods.length > 0"> bestMods </button>
+                  <button ng-click = "modsConstructor()" ng-show = "mods.length > 0"> Constructor </button>
               </div>
               <br>
-              <!--<div>-->
-                  <!--MANAGE UNITS-->
-                  <!--<select ng-model = "selectedHero">-->
-                      <!--<option ng-repeat = "hero in heroes" value="{{hero.name}}">-->
-                      <!--{{hero.name}}-->
-                      <!--</option>-->
-                  <!--</select>-->
-                  <!--<input type="text" ng-model="newName">-->
-                  <!--<button ng-show = "newName.length > 0 " ng-click = "createNewUnit()">-->
-                      <!--CREATE-->
-                  <!--</button>-->
-                  <!--<button ng-show = "selectedHero.length > 0" ng-click = "deleteOldUnit()">-->
-                      <!--DELETE-->
-                  <!--</button>-->
-              <!--</div>-->
               <br>
-              <!--<div>-->
-                  <!--CREATE NEW MOD:-->
-                  <!--FORM <select ng-model = "selectedForm" ng-change = "changeModFilter()">-->
-                      <!--<option ng-repeat = "form in modForms" value="{{form}}">-->
-                          <!--{{form}}-->
-                      <!--</option>-->
-                  <!--</select>-->
-                  <!--SET <select ng-model = "selectedSet">-->
-                      <!--<option ng-repeat = "set in modSets" value="{{set}}">-->
-                          <!--{{set}}-->
-                      <!--</option>-->
-                  <!--</select>-->
-                  <!--MAIN <select ng-model = "selectedMain">-->
-                      <!--<option ng-repeat = "main in modSets" value="{{main}}">-->
-                          <!--{{main}}-->
-                      <!--</option>-->
-                   <!--</select>-->
-                  <!--STARS-->
-                  <!--<input type="number" min = "1" max="5" ng-model="stars">-->
-                  <!--SPEED-->
-                  <!--<input type="number" min = "0" max="30" ng-model="additionalSpeed">-->
-                  <!--<button ng-show = "selectedForm && selectedSet && selectedMain && additionalSpeed" ng-click = "createNewMod()">-->
-                      <!--CREATE-->
-                  <!--</button>-->
-                  <!--&lt;!&ndash;<button ng-show = "selectedHero.length > 0" ng-click = "deleteOldUnit()">&ndash;&gt;-->
-                      <!--&lt;!&ndash;DELETE&ndash;&gt;-->
-                  <!--&lt;!&ndash;</button>&ndash;&gt;-->
-              <!--</div>-->
+
+
+          </div >
+            <div ng-if = "viewModel === 1">
+                MODS CAN BE UPGRADED WITH SPEED + :
+                <br>
+                <br>
+                <div ng-repeat = "mod in needUpgradeMods">
+                    {{$index + 1}} {{mod.forma}} -- {{mod.set}} -- {{mod.hero}} -- {{mod.level}} level  -- {{mod.mainStat === "Speed" ? "MAIN GOAL" : ""}}
+
+                </div>
+            </div>
+            <div ng-if = "viewModel === 2">
+                BEST MODS
+                <div ng-repeat = "mod in bestMods">
+                    {{$index + 1}} {{mod.forma}} -- {{mod.set}} -- {{mod.hero}} -- {{mod.level}} level  + {{mod.addSpeed}} speed
+
+                </div>
+
+            </div>
+
+          <div ng-if = "viewModel === 3">
+
+
+
+              Constructor
+              <br>
+              <br>
+
+
+              <select ng-model = "selectedHero">
+              <option ng-repeat = "hero in unFrezedHeroes | orderBy:'name'" value="{{hero.name}}">
+              {{hero.name}}
+              </option>
+              </select>
+              <button ng-click = "frezeHero(selectedHero)"> Freze </button>
+              <br>
+              <br>
+
+              <select ng-model = "selectedMain">
+                  <option ng-repeat = "option in setsProps" value="{{option.name}}" >
+                      {{option.name}}
+                  </option>
+              </select>
+
+              <select ng-model = "selectedFirstdSet">
+                  <option ng-repeat = "option in setsProps | filter: filterProps " >
+                      {{option.name}}
+                  </option>
+              </select>
+
+              <select ng-model = "selectedSecondSet" >
+                  <option ng-repeat = "option in setsProps | filter: filterProps " >
+                      {{option.name}}
+                  </option>
+              </select>
+              <select ng-model = "selectedThirdSet" >
+                  <option ng-repeat = "option in setsProps | filter: filterProps "  >
+                      {{option.name}}
+                  </option>
+              </select>
+
+              <br>
+              <br>
+
+              FREEZED MODS ON HEROES (click on name to remove)
+              <div ng-repeat = "fHero in frezedHeroes | orderBy:'name'" ng-click = "unFrezeHero(fHero.name)">
+                  {{fHero.name}}
+              </div>
 
           </div>
 
-          MODS CAN BE UPGRADED WITH SPEED + :
-          <br>
-          <br>
-          <div ng-repeat = "mod in needUpgradeMods">
-             {{$index + 1}} {{mod.forma}} -- {{mod.set}} -- {{mod.hero}} -- {{mod.level}} level  -- {{mod.mainStat === "Speed" ? "MAIN GOAL" : ""}}
-
           </div>
 
-          <!--<div style="float: left; width: 50%">-->
-              <!--<div ng-repeat  = "city in generalData | orderBy : 'cityName' track by $index">-->
-                    <!--{{city.cityName}}-->
-                  <!--<select ng-model = "selectedDistrict">-->
-                        <!--<option ng-repeat = "district in city.districts" value="{{district.zip}}">-->
-                            <!--{{district.zip}}-->
-                        <!--</option>-->
 
-                  <!--</select>-->
-                  <!--<button ng-click = "selectDistrictForDetails(selectedDistrict)">DETAILS</button>-->
-              <!--</div>-->
-          <!--</div>-->
-          <!--<div style="margin-left: 51%">-->
-             <!--{{greetings}}. {{generalData.length}} from {{collectionSize}}-->
-              <!--<br><br>-->
-              <!--<div ng-show = districtDetail>-->
-                  <!--{{districtDetail.city}} zip: {{districtDetail.zip}} lat: {{districtDetail.lat}} lon: {{districtDetail.lon}}-->
-              <!--</div>-->
-              <!--<br>-->
-              <!--<div ng-repeat = "nearDistrict in details">-->
-                  <!--{{nearDistrict.zip}} {{nearDistrict.city}} distance to {{districtDetail.city}}({{districtDetail.zip}}) - {{nearDistrict.distance}} meters-->
-              <!--</div>-->
-          <!--</div>-->
       </div>
   </div>
 
 </body>
 </html>
+
+
+<!--<div>-->
+<!--CREATE NEW MOD:-->
+<!--FORM <select ng-model = "selectedForm" ng-change = "changeModFilter()">-->
+<!--<option ng-repeat = "form in modForms" value="{{form}}">-->
+<!--{{form}}-->
+<!--</option>-->
+<!--</select>-->
+<!--SET <select ng-model = "selectedSet">-->
+<!--<option ng-repeat = "set in modSets" value="{{set}}">-->
+<!--{{set}}-->
+<!--</option>-->
+<!--</select>-->
+<!--MAIN <select ng-model = "selectedMain">-->
+<!--<option ng-repeat = "main in modSets" value="{{main}}">-->
+<!--{{main}}-->
+<!--</option>-->
+<!--</select>-->
+<!--STARS-->
+<!--<input type="number" min = "1" max="5" ng-model="stars">-->
+<!--SPEED-->
+<!--<input type="number" min = "0" max="30" ng-model="additionalSpeed">-->
+<!--<button ng-show = "selectedForm && selectedSet && selectedMain && additionalSpeed" ng-click = "createNewMod()">-->
+<!--CREATE-->
+<!--</button>-->
+<!--&lt;!&ndash;<button ng-show = "selectedHero.length > 0" ng-click = "deleteOldUnit()">&ndash;&gt;-->
+<!--&lt;!&ndash;DELETE&ndash;&gt;-->
+<!--&lt;!&ndash;</button>&ndash;&gt;-->
+<!--</div>-->
+
+
+
+<!--<div style="float: left; width: 50%">-->
+<!--<div ng-repeat  = "city in generalData | orderBy : 'cityName' track by $index">-->
+<!--{{city.cityName}}-->
+<!--<select ng-model = "selectedDistrict">-->
+<!--<option ng-repeat = "district in city.districts" value="{{district.zip}}">-->
+<!--{{district.zip}}-->
+<!--</option>-->
+
+<!--</select>-->
+<!--<button ng-click = "selectDistrictForDetails(selectedDistrict)">DETAILS</button>-->
+<!--</div>-->
+<!--</div>-->
+<!--<div style="margin-left: 51%">-->
+<!--{{greetings}}. {{generalData.length}} from {{collectionSize}}-->
+<!--<br><br>-->
+<!--<div ng-show = districtDetail>-->
+<!--{{districtDetail.city}} zip: {{districtDetail.zip}} lat: {{districtDetail.lat}} lon: {{districtDetail.lon}}-->
+<!--</div>-->
+<!--<br>-->
+<!--<div ng-repeat = "nearDistrict in details">-->
+<!--{{nearDistrict.zip}} {{nearDistrict.city}} distance to {{districtDetail.city}}({{districtDetail.zip}}) - {{nearDistrict.distance}} meters-->
+<!--</div>-->
+<!--</div>--
+
+
+
+              <!--<select ng-model = "selectedThirdSet" ng-if = "selectedFirstSet && selectedSecondSet && seselectedSecondSet + selectedFirstSet < 6">-->
+<!--<option ng-repeat = "option in setsProps | filter: filterProps " value="{{option.name}}" >-->
+<!--{{option.name}}-->
+<!--</option>-->
+<!--</select>-->
+
+
+<!--<div>-->
+<!--MANAGE UNITS-->
+<!--<select ng-model = "selectedHero">-->
+<!--<option ng-repeat = "hero in heroes" value="{{hero.name}}">-->
+<!--{{hero.name}}-->
+<!--</option>-->
+<!--</select>-->
+<!--<input type="text" ng-model="newName">-->
+<!--<button ng-show = "newName.length > 0 " ng-click = "createNewUnit()">-->
+<!--CREATE-->
+<!--</button>-->
+<!--<button ng-show = "selectedHero.length > 0" ng-click = "deleteOldUnit()">-->
+<!--DELETE-->
+<!--</button>-->
+<!--</div>-->
