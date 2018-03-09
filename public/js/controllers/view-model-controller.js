@@ -18,8 +18,15 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     vm.admin = false;
     vm.viewModel = 0;
     vm.bestMods = [];
+    vm.setsForBestMods = [];
+    vm.needSetThree = false;
     // vm.selectedSecondSet;
     // vm.selectedFirstdSet;
+
+    // const {DataCalc} = import ('./server/dataCalc');
+    // //let dataCalc  = new DataCalc();
+
+
 
 
     vm.setsProps = [
@@ -65,8 +72,8 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     vm.heroes = [
     ];
 
-    vm.modForms = ["arrow", "square", "rhombus", "triangle", "circle", "cross"];
-    vm.modSets = ["health", "defence", "c-damage", "c-chance", "resistance", "offence", "efficient", "speed"];
+   // vm.modForms = ["arrow", "square", "rhombus", "triangle", "circle", "cross"];
+   // vm.modSets = ["health", "defence", "c-damage", "c-chance", "resistance", "offence", "efficient", "speed"];
     vm.myMods = [];
 
 
@@ -278,12 +285,89 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
 
 
     vm.adminTest = function () {
-        console.log(vm.selectedFirstdSet, vm.selectedSecondSet, vm.selectedThirdSet, vm.selectedMain);
+        console.log(vm.setsCount());
+
         socket.emit("admin");
+    };
+
+    vm.selectSetOne = function(setName) {
+        vm.setsForBestMods[0] = vm.setsProps.find(set => set.name === setName);
+        console.log ("SET name ", setName);
+    };
+
+    vm.selectSetTwo = function(setName) {
+        vm.setsForBestMods[1] = vm.setsProps.find(set => set.name === setName);
+        vm.needSetThree = vm.setsForBestMods[0] && vm.setsForBestMods[1] && vm.setsForBestMods[0].count + vm.setsForBestMods[1].count <= 4;
+        console.log ("SET name ", setName);
+    };
+
+    vm.selectSetThree = function(setName) {
+        console.log ("SET name ", setName);
+        vm.setsForBestMods[2] = vm.setsProps.find(set => set.name === setName);
+    };
+
+
+    vm.setsCount = function () {
+        console.log("setsCount ", vm.setsForBestMods[0].count + vm.setsForBestMods[1].count <= 4);
+        return vm.setsForBestMods[0].count + vm.setsForBestMods[1].count <= 4;
     };
 
     vm.filterProps = function (item) {
         return item.count > 0;
+    };
+
+    vm.filterPropsSetThree = function (item) {
+        return item.count === 2;
+    };
+    
+    vm.dressForHero = function () {
+      console.log(vm.setsForBestMods);
+
+      let modsCount = vm.setsForBestMods.reduce((sum, curr) => {return curr.count + sum}, 0);
+      if (modsCount > 6) {
+          alert("Bad Set choose");
+          return;
+      }
+
+      console.log("Next Step");
+
+      let setCounts = 1;
+      if (vm.setsForBestMods.length > 0) {
+          if (vm.setsForBestMods[0] && vm.setsForBestMods[1] && vm.setsForBestMods[0].count + vm.setsForBestMods[1].count === 4) {
+              setCounts = 3;
+          } else {
+              setCounts = 2;
+          }
+      }
+
+        console.log("setCounts", setCounts);
+        let variants = [].variator(setCounts);
+        let filter = [];
+        if (setCounts === 3) {
+            filter = [2,2,2];
+        }
+        variants = variants.filterValueCount(filter);
+        console.log ("RRRRRR", variants);
+
+        for (let i = 0; i < variants.length; i++){
+
+            let variant = variants[i];
+            let result = [];
+            for (let j = 0; j < variant.length; j++){
+
+                let set = vm.setsForBestMods[variant[j]] ? vm.setsForBestMods[variant[j]].name : "any";
+
+                let modsForSearch = vm.mods.filter( (mod, index) => mod.forma === modForma[j] && (set === "any" || mod.set === set ));
+                //console.log(modForma[j], "  ", modsForSearch)
+                let bestModForPosition = findBestMod(modsForSearch);
+                result.push(bestModForPosition);
+            }
+
+            console.log("Possible Result ", result);
+
+        }
+
+
     };
 
     function showNeedUpgradeMods(mods) {
@@ -310,3 +394,73 @@ function haveAdditionalSpeed(mod) {
 }]);
 
 //&& mod.firstStat !== ""
+Array.prototype.variator = function (alfa) {
+
+    let result = [];
+
+
+    for (let i = 0; i < alfa; i++){
+        let tempResult = [];
+        tempResult.push(i);
+        for (let j = 0; j < alfa; j++){
+            let tempResult1 = [].concat(tempResult);
+            tempResult1.push(j);
+            for (let k = 0; k < alfa; k++){
+                let tempResult2 = [].concat(tempResult1);
+                tempResult2.push(k);
+                for (let l = 0; l < alfa; l++) {
+                    let tempResult3 = [].concat(tempResult2);
+                    tempResult3.push(l);
+                    for (let n = 0; n < alfa; n++){
+                        let tempResult4 = [].concat(tempResult3);
+                        tempResult4.push(n);
+                        for (let m = 0; m < alfa; m++) {
+                            let tempResult5 = [].concat(tempResult4);
+                            tempResult5.push(m);
+                            result.push(tempResult5);
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+    return result;
+};
+
+Array.prototype.filterValueCount = function (valueArray) {
+
+    let result = [];
+
+    this.forEach(data => {
+        if (valueArray.every((value, index) => {
+                return data.howMachIs(index) === value;
+            })) {
+            result.push(data);
+        }
+    });
+
+    return result;
+};
+
+Array.prototype.howMachIs = function (value) {
+    return this.reduce((sum, current) => {
+        return current === value ?  ++sum : sum;
+    }, 0);
+};
+
+function findBestMod(mods) {
+    let result = [mods[0]];
+
+    mods.forEach(mod => {
+       if (mod.addSpeed === result[0].addSpeed) {
+           result.push(mod);
+       }
+
+       if (mod.addSpeed > result[0].addSpeed) {
+           result = [mod];
+       }
+    });
+
+    return result;
+}

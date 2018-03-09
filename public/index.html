@@ -73,22 +73,27 @@
                   </option>
               </select>
 
-              <select ng-model = "selectedFirstdSet">
-                  <option ng-repeat = "option in setsProps | filter: filterProps " >
+              <select ng-model = "selectedSet1" ng-change = "selectSetOne(selectedSet1)">
+                  <option ng-repeat = "option in setsProps | filter : filterProps" value="{{option.name}}"  >
                       {{option.name}}
                   </option>
               </select>
 
-              <select ng-model = "selectedSecondSet" >
-                  <option ng-repeat = "option in setsProps | filter: filterProps " >
+              <select ng-model = "selectedSet2" ng-change = "selectSetTwo(selectedSet2)" ng-if = "selectedSet1">
+                  <option ng-repeat = "option in setsProps | filter : filterProps" value="{{option.name}}"  >
                       {{option.name}}
                   </option>
               </select>
-              <select ng-model = "selectedThirdSet" >
-                  <option ng-repeat = "option in setsProps | filter: filterProps "  >
+
+              <select ng-model = "selectedSet3" ng-change = "selectSetThree(selectedSet3)" ng-if = "needSetThree">
+                  <option ng-repeat = "option in setsProps | filter : filterPropsSetThree" value="{{option.name}}"  >
                       {{option.name}}
                   </option>
               </select>
+
+              <button ng-click = "dressForHero()">
+                  Find Best Mods
+              </button>
 
               <br>
               <br>

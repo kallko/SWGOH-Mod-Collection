@@ -133,3 +133,4 @@ dataCalc.prototype.calcSets = function (units, heroesCollection, setsProps) {
 
     return units;
 };
+

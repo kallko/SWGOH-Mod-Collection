@@ -21,6 +21,12 @@ console.log(new Date());
 let hrParser  = new HtmlResultParser();
 let dataCalc  = new DataCalc();
 
+let variants = dataCalc.variator(2);
+let variants2 = dataCalc.filterValueCount(variants, [2,4]);
+console.log("VARIANTS2", variants2);
+
+
+
 app.use('/', router);
 server.listen(port);
 
@@ -242,6 +248,8 @@ function loadDataForNewUser(login, socket) {
 
 
     function joinModsAndUnits(mods, units) {
+
+
         mods.forEach(mod => {
             let hero = units.find(unit => unit.name === mod.hero);
             if (hero) {
