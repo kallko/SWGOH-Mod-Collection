@@ -21,10 +21,6 @@ console.log(new Date());
 let hrParser  = new HtmlResultParser();
 let dataCalc  = new DataCalc();
 
-let variants = dataCalc.variator(2);
-let variants2 = dataCalc.filterValueCount(variants, [2,4]);
-console.log("VARIANTS2", variants2);
-
 
 
 app.use('/', router);

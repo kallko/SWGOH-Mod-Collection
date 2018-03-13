@@ -20,6 +20,7 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     vm.bestMods = [];
     vm.setsForBestMods = [];
     vm.needSetThree = false;
+    vm.variantOfSets = [];
     // vm.selectedSecondSet;
     // vm.selectedFirstdSet;
 
@@ -113,7 +114,7 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     vm.findNeedUpgradeMods = function () {
         vm.viewModel = 1;
         showNeedUpgradeMods(vm.mods);
-        vm.$apply();
+        //vm.$apply();
     };
 
     vm.findBestMods = function () {
@@ -196,6 +197,8 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
         vm.viewModel = 1;
         vm.$apply();
         console.log("RECEIVED ", vm.heroes);
+        let i = 0;
+        vm.mods.forEach(mod => mod.id = ++i);
         console.log("RECEIVED ", vm.mods);
         console.log("RECEIVED ", vm.heroesCollection);
 
@@ -292,20 +295,24 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
 
     vm.selectSetOne = function(setName) {
         vm.setsForBestMods[0] = vm.setsProps.find(set => set.name === setName);
+        vm.setsForBestMods.length = 1;
+        vm.selectedSet2 = null;
         console.log ("SET name ", setName);
     };
 
     vm.selectSetTwo = function(setName) {
         vm.setsForBestMods[1] = vm.setsProps.find(set => set.name === setName);
+        vm.setsForBestMods.length = 2;
+        vm.selectedSet3 = null;
         vm.needSetThree = vm.setsForBestMods[0] && vm.setsForBestMods[1] && vm.setsForBestMods[0].count + vm.setsForBestMods[1].count <= 4;
         console.log ("SET name ", setName);
+
     };
 
     vm.selectSetThree = function(setName) {
         console.log ("SET name ", setName);
         vm.setsForBestMods[2] = vm.setsProps.find(set => set.name === setName);
     };
-
 
     vm.setsCount = function () {
         console.log("setsCount ", vm.setsForBestMods[0].count + vm.setsForBestMods[1].count <= 4);
@@ -322,6 +329,18 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     
     vm.dressForHero = function () {
       console.log(vm.setsForBestMods);
+
+      console.log("FREEZ ", vm.frezedHeroes);
+      let avaliableMods = [];
+
+      vm.mods.forEach(mod => {
+          if (!vm.frezedHeroes.some(hero => hero.name === mod.hero)) {
+              avaliableMods.push(mod);
+          }
+      });
+
+
+      let bestSet = {set:[]};
 
       let modsCount = vm.setsForBestMods.reduce((sum, curr) => {return curr.count + sum}, 0);
       if (modsCount > 6) {
@@ -342,13 +361,24 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
 
         console.log("setCounts", setCounts);
         let variants = [].variator(setCounts);
-        let filter = [];
-        if (setCounts === 3) {
-            filter = [2,2,2];
-        }
-        variants = variants.filterValueCount(filter);
-        console.log ("RRRRRR", variants);
 
+        let filter = [];
+
+        filter = createFilterForVariants();
+
+        //todo create filter
+        // if (setCounts === 3) {
+        //     filter = [2,2,2];
+        // } else {
+        //     filter = [4,2];
+        // }
+
+
+
+        variants = variants.filterValueCount(filter);
+        console.log ("VARIANTS : ", variants);
+
+        let h = 0;
         for (let i = 0; i < variants.length; i++){
 
             let variant = variants[i];
@@ -357,16 +387,27 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
 
                 let set = vm.setsForBestMods[variant[j]] ? vm.setsForBestMods[variant[j]].name : "any";
 
-                let modsForSearch = vm.mods.filter( (mod, index) => mod.forma === modForma[j] && (set === "any" || mod.set === set ));
+                let modsForSearch = avaliableMods.filter( (mod, index) => mod.forma === modForma[j] && (set === "any" || mod.set === set ));
                 //console.log(modForma[j], "  ", modsForSearch)
                 let bestModForPosition = findBestMod(modsForSearch);
                 result.push(bestModForPosition);
             }
 
-            console.log("Possible Result ", result);
+            //setSpeedCalculate(result);
+            //console.log("Possible Result ", result);
+            let addSpeed = setSpeedCalculate(result);
+            if (!bestSet.addSpeed || bestSet.addSpeed < addSpeed) {
+                bestSet.set.push(result);
+                bestSet.addSpeed = addSpeed;
+            }
+            //console.log("Possible Result ", setSpeedCalculate(result));
 
         }
 
+        //console.log(bestSet);
+        bestSet.set = clearDataForAngularShow(bestSet.set);
+        //bestSet.set = clearDataForAngularShow(bestSet.set);
+        vm.variantOfSets = JSON.parse(JSON.stringify(bestSet));
 
     };
 
@@ -378,7 +419,7 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
        // vm.needUpgradeMods = vm.needUpgradeMods.concat(secondLineMods);
        //  console.log("needUpgradeMods ", vm.needUpgradeMods);
 
-        vm.$apply();
+        //vm.$apply();
     }
 
 function isSpeedReceiver(mod) {
@@ -391,7 +432,73 @@ function haveAdditionalSpeed(mod) {
             (parseInt(mod.level) < 9 && (mod.firstStat === "Speed" || mod.secondStat === "Speed" || mod.thirdStat === "Speed")) ||
             (parseInt(mod.level) < 12 && (mod.firstStat === "Speed" || mod.secondStat === "Speed"|| mod.thirdStat === "Speed" || mod.forthStat === "Speed"))
 }
+
+
+function createFilterForVariants() {
+
+        console.log(vm.setsForBestMods);
+
+
+        if (vm.setsForBestMods.length === 0) {
+            return [];
+        }
+
+        if (vm.setsForBestMods.length === 1) {
+            let count = vm.setsForBestMods[0].count;
+            return [count, 6 - count];
+        }
+
+        if (vm.setsForBestMods.length === 2) {
+            if (vm.setsForBestMods[0].name === vm.setsForBestMods[1].name) {
+                return [4,0];
+            } else {
+                if (vm.setsForBestMods[0].count + vm.setsForBestMods[1].count === 6) {
+                    return [vm.setsForBestMods[0].count, vm.setsForBestMods[1].count];
+                } else {
+                    return [2,2,2];
+                }
+            }
+
+        }
+
+    if (vm.setsForBestMods.length === 3) {
+
+        return [2,2,2];
+    }
+
+        // console.log(result);
+        // return result;
+    }
+
+
 }]);
+
+
+
+
+function clearDataForAngularShow(sets) {
+    //console.log("Start Clearing");
+
+    let generalMods = [];
+    let i = 10000;
+    sets.forEach(set => set.forEach(mods => mods.forEach((mod, index, array) => {
+        if(generalMods.some((gMod => gMod === mod))) {
+            //console.log ("Find Duplicate");
+            array[index] = JSON.parse(JSON.stringify(mod));
+            array[index].id = ++i;
+        } else {
+            generalMods.push(mod);
+        }
+
+        //console.log("Mod ", mod);
+    })));
+    //console.log(generalMods);
+    return sets;
+}
+
+function setSpeedCalculate(sets) {
+     return sets.reduce((sum, cur) => cur[0].addSpeed + sum, 0);
+}
 
 //&& mod.firstStat !== ""
 Array.prototype.variator = function (alfa) {
@@ -425,12 +532,19 @@ Array.prototype.variator = function (alfa) {
         }
 
     }
+    console.log("Define Result ", result);
     return result;
 };
 
 Array.prototype.filterValueCount = function (valueArray) {
 
     let result = [];
+
+    console.log( "VALUE ARRAY ", valueArray);
+
+    if (valueArray.length === 0){
+        return [[0,0,0,0,0,0]]
+    }
 
     this.forEach(data => {
         if (valueArray.every((value, index) => {
@@ -440,6 +554,7 @@ Array.prototype.filterValueCount = function (valueArray) {
         }
     });
 
+    //console.log("RESULT 2", result);
     return result;
 };
 
@@ -452,15 +567,19 @@ Array.prototype.howMachIs = function (value) {
 function findBestMod(mods) {
     let result = [mods[0]];
 
-    mods.forEach(mod => {
-       if (mod.addSpeed === result[0].addSpeed) {
-           result.push(mod);
-       }
+    mods.forEach((mod, index) => {
+        if (mod.addSpeed === result[0].addSpeed && index > 0) {
+            result.push(mod);
+        }
 
-       if (mod.addSpeed > result[0].addSpeed) {
-           result = [mod];
-       }
+        if (mod.addSpeed > result[0].addSpeed) {
+            result = [mod];
+        }
+
+
+
     });
 
     return result;
 }
+

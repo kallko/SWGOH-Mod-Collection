@@ -17,14 +17,16 @@
       <div ng-controller = "viewModelController">
           <div>
               <div>
+
+                  Input your login on "https://swgoh.gg/" and push "Load"
                   <input type="text" ng-model="user">
                   <button ng-click = "loadNewData()"> LOAD </button>
                   <button ng-click = "adminTest()" ng-show = "admin"> admin </button>
                   <br>
                   <br>
-                  <button ng-click = "findNeedUpgradeMods()" ng-show = "mods.length > 0"> need Upgrade </button>
-                  <button ng-click = "findBestMods()" ng-show = "mods.length > 0"> bestMods </button>
-                  <button ng-click = "modsConstructor()" ng-show = "mods.length > 0"> Constructor </button>
+                  <button ng-click = "findNeedUpgradeMods()" ng-show = "mods.length > 0" title= "All mods you can upgrade with additional speed"> need Upgrade </button>
+                  <button ng-click = "findBestMods()" ng-show = "mods.length > 0" title= "Best mods each form with additional speed"> bestMods </button>
+                  <button ng-click = "modsConstructor()" ng-show = "mods.length > 0" title= "Find best set of mods for hero"> Constructor </button>
               </div>
               <br>
               <br>
@@ -55,9 +57,10 @@
 
               Constructor
               <br>
+
               <br>
 
-
+              Exclude mods of this heroes from search :
               <select ng-model = "selectedHero">
               <option ng-repeat = "hero in unFrezedHeroes | orderBy:'name'" value="{{hero.name}}">
               {{hero.name}}
@@ -66,12 +69,15 @@
               <button ng-click = "frezeHero(selectedHero)"> Freze </button>
               <br>
               <br>
+              Chose sets for mods :
 
-              <select ng-model = "selectedMain">
-                  <option ng-repeat = "option in setsProps" value="{{option.name}}" >
-                      {{option.name}}
-                  </option>
-              </select>
+              <br>
+
+              <!--<select ng-model = "selectedMain">-->
+                  <!--<option ng-repeat = "option in setsProps" value="{{option.name}}" >-->
+                      <!--{{option.name}}-->
+                  <!--</option>-->
+              <!--</select>-->
 
               <select ng-model = "selectedSet1" ng-change = "selectSetOne(selectedSet1)">
                   <option ng-repeat = "option in setsProps | filter : filterProps" value="{{option.name}}"  >
@@ -102,6 +108,30 @@
               <div ng-repeat = "fHero in frezedHeroes | orderBy:'name'" ng-click = "unFrezeHero(fHero.name)">
                   {{fHero.name}}
               </div>
+              <br>
+              <br>
+              <div>
+                  SETS add speed : {{variantOfSets.addSpeed}}
+                  <div ng-repeat = "set in variantOfSets">
+                      <div ng-repeat = "fMods in set">
+                         <br>
+                          +++++++++++++++++++++++++++++++++++
+                          <!--{{fMods[0]}}-->
+                          <div ng-repeat = "mods in fMods">
+                              >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                              <div ng-repeat = "mod in mods"  >
+                                  {{mod.forma}} {{mod.set}} {{mod.hero}} + {{mod.addSpeed}} speed
+
+                              </div>
+                              >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                          </div>
+
+                      </div>
+
+                  </div>
+
+              </div>
+
 
           </div>
 
