@@ -62,13 +62,11 @@ loadAllHeroes();
 io.on('connection', function (socket) {
 
 
-
-    console.log("New connection");
-
     socket.on('newUserData', function(login){
+        console.log("User connected ", login);
 
         if (bigData[login] && bigData[login].finished) {
-            console.log("DATA ALREADY CREATED ", login);
+
             socket.emit("heroes", bigData[login])
 
         } else {
@@ -81,8 +79,6 @@ io.on('connection', function (socket) {
                 bigData[login].mods = [];
                 loadDataForNewUser(login, socket);
             }
-
-
 
         }
     });

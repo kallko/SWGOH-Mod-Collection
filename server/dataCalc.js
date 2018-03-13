@@ -71,10 +71,10 @@ dataCalc.prototype.calcSets = function (units, heroesCollection, setsProps) {
 
             if (unit.name === "Talia") {
 
-                console.log("TALIA addDefensePercent ", unit.addDefensePercent );
+                //console.log("TALIA addDefensePercent ", unit.addDefensePercent );
                 for (let key in unit) {
 
-                    console.log("KEY - ", key);
+                    //console.log("KEY - ", key);
 
                     unit.checked = true;
 
