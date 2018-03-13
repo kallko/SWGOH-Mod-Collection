@@ -450,7 +450,7 @@ function createFilterForVariants() {
 
         if (vm.setsForBestMods.length === 2) {
             if (vm.setsForBestMods[0].name === vm.setsForBestMods[1].name) {
-                return [4,0];
+                return [2,2];
             } else {
                 if (vm.setsForBestMods[0].count + vm.setsForBestMods[1].count === 6) {
                     return [vm.setsForBestMods[0].count, vm.setsForBestMods[1].count];
