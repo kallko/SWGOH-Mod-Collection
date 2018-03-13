@@ -58,8 +58,8 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     let currentUser = localStorage.getItem('currentUser');
     // localStorage.setItem('currentUser', vm.gameId);
 
-    socket = io.connect('http://93.183.200.136:9021');
-    //socket = io.connect('http://localhost:9021');
+    //socket = io.connect('http://93.183.200.136:9021');
+    socket = io.connect('http://localhost:9021');
 
     console.log("CURRENT USER ", currentUser);
 
@@ -326,12 +326,19 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     vm.filterPropsSetThree = function (item) {
         return item.count === 2;
     };
-    
+
+    vm.resetMods = function () {
+        vm.variantOfSets = [];
+        vm.setsForBestMods = [];
+    };
+
+
     vm.dressForHero = function () {
       console.log(vm.setsForBestMods);
 
       console.log("FREEZ ", vm.frezedHeroes);
       let avaliableMods = [];
+      vm.variantOfSets = [];
 
       vm.mods.forEach(mod => {
           if (!vm.frezedHeroes.some(hero => hero.name === mod.hero)) {
@@ -366,15 +373,6 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
 
         filter = createFilterForVariants();
 
-        //todo create filter
-        // if (setCounts === 3) {
-        //     filter = [2,2,2];
-        // } else {
-        //     filter = [4,2];
-        // }
-
-
-
         variants = variants.filterValueCount(filter);
         console.log ("VARIANTS : ", variants);
 
@@ -397,6 +395,7 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
             //console.log("Possible Result ", result);
             let addSpeed = setSpeedCalculate(result);
             if (!bestSet.addSpeed || bestSet.addSpeed < addSpeed) {
+                bestSet.set = [];
                 bestSet.set.push(result);
                 bestSet.addSpeed = addSpeed;
             }
