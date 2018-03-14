@@ -294,7 +294,7 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
         }
 
 
-        if (vm.selectedModMain && vm.selectedModMain.name !== "Any") {
+        if (vm.selectedModMain && vm.selectedModMain !== "Any") {
             vm.modsFiltered = vm.modsFiltered.filter(mod => mod.mainStat === vm.selectedModMain);
         }
 
