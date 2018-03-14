@@ -157,7 +157,7 @@ io.on('connection', function (socket) {
 
 
 
-    console.log("USER CONNECTED");
+    //console.log("USER CONNECTED");
 
 });
 

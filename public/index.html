@@ -13,137 +13,191 @@
 <body>
 
 
-  <div ng-app="GermanZip">
-      <div ng-controller = "viewModelController">
-          <div>
-              <div>
+<div ng-app="GermanZip">
+    <div ng-controller="viewModelController">
+        <div>
+            <div>
 
-                  Input your login on "https://swgoh.gg/" and push "Load"
-                  <input type="text" ng-model="user">
-                  <button ng-click = "loadNewData()"> LOAD </button>
-                  <button ng-click = "adminTest()" ng-show = "admin"> admin </button>
-                  <br>
-                  <br>
-                  <button ng-click = "findNeedUpgradeMods()" ng-show = "mods.length > 0" title= "All mods you can upgrade with additional speed"> need Upgrade </button>
-                  <button ng-click = "findBestMods()" ng-show = "mods.length > 0" title= "Best mods each form with additional speed"> bestMods </button>
-                  <button ng-click = "modsConstructor()" ng-show = "mods.length > 0" title= "Find best set of mods for hero"> Constructor </button>
-              </div>
-              <br>
-              <br>
-
-
-          </div >
-            <div ng-if = "viewModel === 1">
-                MODS CAN BE UPGRADED WITH SPEED + :
+                Input your login on "https://swgoh.gg/" and push "Load"
+                <input type="text" ng-model="user">
+                <button ng-click="loadNewData()"> LOAD</button>
+                <button ng-click="adminTest()" ng-show="admin"> admin</button>
                 <br>
                 <br>
-                <div ng-repeat = "mod in needUpgradeMods">
-                    {{$index + 1}} {{mod.forma}} -- {{mod.set}} -- {{mod.hero}} -- {{mod.level}} level  -- {{mod.mainStat === "Speed" ? "MAIN GOAL" : ""}}
+                <button ng-click="findNeedUpgradeMods()" ng-show="mods.length > 0"
+                        title="All mods you can upgrade with additional speed"> need Upgrade
+                </button>
+                <button ng-click="findBestMods()" ng-show="mods.length > 0"
+                        title="Best mods each form with additional speed"> bestMods
+                </button>
+                <button ng-click="modsConstructor()" ng-show="mods.length > 0" title="Find best set of mods for hero">
+                    Constructor
+                </button>
+                <button ng-click="modsFilter()" ng-show="mods.length > 0" title="Find mods with known parameters"> Find
+                    Mods
+                </button>
+            </div>
+            <br>
+            <br>
+
+
+        </div>
+        <div ng-if="viewModel === 1">
+            MODS CAN BE UPGRADED WITH SPEED + :
+            <br>
+            <br>
+            <div ng-repeat="mod in needUpgradeMods">
+                {{$index + 1}} {{mod.forma}} -- {{mod.set}} -- {{mod.hero}} -- {{mod.level}} level -- {{mod.mainStat ===
+                "Speed" ? "MAIN GOAL" : ""}}
+
+            </div>
+        </div>
+        <div ng-if="viewModel === 2">
+            BEST MODS
+            <div ng-repeat="mod in bestMods">
+                {{$index + 1}} {{mod.forma}} -- {{mod.set}} -- {{mod.hero}} -- {{mod.level}} level + {{mod.addSpeed}}
+                speed
+
+            </div>
+
+        </div>
+
+        <div ng-if="viewModel === 3">
+
+
+            Constructor
+            <br>
+
+            <br>
+
+            Exclude mods of this heroes from search :
+            <select ng-model="selectedHero">
+                <option ng-repeat="hero in unFrezedHeroes | orderBy:'name'" value="{{hero.name}}">
+                    {{hero.name}}
+                </option>
+            </select>
+            <button ng-click="frezeHero(selectedHero)"> Freze</button>
+            <br>
+            <br>
+            Chose sets for mods :
+
+            <br>
+
+            <!--<select ng-model = "selectedMain">-->
+            <!--<option ng-repeat = "option in setsProps" value="{{option.name}}" >-->
+            <!--{{option.name}}-->
+            <!--</option>-->
+            <!--</select>-->
+
+            <select ng-model="selectedSet1" ng-change="selectSetOne(selectedSet1)">
+                <option ng-repeat="option in setsProps | filter : filterProps" value="{{option.name}}">
+                    {{option.name}}
+                </option>
+            </select>
+
+            <select ng-model="selectedSet2" ng-change="selectSetTwo(selectedSet2)" ng-if="selectedSet1">
+                <option ng-repeat="option in setsProps | filter : filterProps" value="{{option.name}}">
+                    {{option.name}}
+                </option>
+            </select>
+
+            <select ng-model="selectedSet3" ng-change="selectSetThree(selectedSet3)" ng-if="needSetThree">
+                <option ng-repeat="option in setsProps | filter : filterPropsSetThree" value="{{option.name}}">
+                    {{option.name}}
+                </option>
+            </select>
+
+            <button ng-click="dressForHero()">
+                Find Best Mods
+            </button>
+            <button ng-click="resetMods()">
+                Reset Best Mods
+            </button>
+
+            <br>
+            <br>
+
+            FREEZED MODS ON HEROES (click on name to remove)
+            <div ng-repeat="fHero in frezedHeroes | orderBy:'name'" ng-click="unFrezeHero(fHero.name)">
+                {{fHero.name}}
+            </div>
+            <br>
+            <br>
+            <div>
+
+                <div ng-repeat="set in variantOfSets">
+                    +++++++++++++++++SETS add speed : {{variantOfSets.addSpeed}} ++++++++++++++++++
+                    <div ng-repeat="fMods in set">
+                        <br>
+
+                        <!--{{fMods[0]}}-->
+                        <div ng-repeat="mods in fMods">
+                            >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                            <div ng-repeat="mod in mods">
+                                {{mod.forma}} SET: {{mod.set}} MAIN: {{mod.mainStat}} {{mod.hero}} + {{mod.addSpeed}}
+                                speed
+
+                            </div>
+                            >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div ng-if="viewModel === 4">
+            <div> FORM  :
+                <select ng-model="selectedModForma" ng-change = "modFormaChanged(selectedModForma)">
+                    <option ng-repeat = "form in modForm" value="{{form}}" >
+                        {{form}}
+                    </option>
+                </select>
+
+                SET  :
+                <select ng-model="selectedModSet" ng-change = "modSetChanged(selectedModSet)">
+                    <option ng-repeat = "set in modSets" value="{{set.name}}" >
+                        {{set.name}}
+                    </option>
+                </select>
+
+                MAIN PROPS  :
+                <select ng-model="selectedModMain" ng-change = "modMainChanged(selectedModMain)">
+                    <option ng-repeat = "main in modMains" value="{{main}}" >
+                        {{main}}
+                    </option>
+                </select>
+
+                <button ng-click="resetFilters()">
+                    Reset Filters
+                </button>
+
+                <!--<button ng-click="applyAllFilters()">-->
+                    <!--Apply Filters-->
+                <!--</button>-->
+            </div>
+
+            <div>
+                <br>
+                {{modsFiltered.length}} mods found. (Wi will show only 30 or less)
+                <br>
+                <div ng-if="modsFiltered.length > 0 && modsFiltered.length < 31">
+                    <br>
+                    <div ng-repeat = "mod in modsFiltered | orderBy:'-addSpeed'">
+                       {{$index + 1}} {{mod.forma}} {{mod.set}} {{mod.hero}} + {{mod.addSpeed}} speed
+
+                    </div>
 
                 </div>
             </div>
-            <div ng-if = "viewModel === 2">
-                BEST MODS
-                <div ng-repeat = "mod in bestMods">
-                    {{$index + 1}} {{mod.forma}} -- {{mod.set}} -- {{mod.hero}} -- {{mod.level}} level  + {{mod.addSpeed}} speed
+        </div>
 
-                </div>
-
-            </div>
-
-          <div ng-if = "viewModel === 3">
-
-
-
-              Constructor
-              <br>
-
-              <br>
-
-              Exclude mods of this heroes from search :
-              <select ng-model = "selectedHero">
-              <option ng-repeat = "hero in unFrezedHeroes | orderBy:'name'" value="{{hero.name}}">
-              {{hero.name}}
-              </option>
-              </select>
-              <button ng-click = "frezeHero(selectedHero)"> Freze </button>
-              <br>
-              <br>
-              Chose sets for mods :
-
-              <br>
-
-              <!--<select ng-model = "selectedMain">-->
-                  <!--<option ng-repeat = "option in setsProps" value="{{option.name}}" >-->
-                      <!--{{option.name}}-->
-                  <!--</option>-->
-              <!--</select>-->
-
-              <select ng-model = "selectedSet1" ng-change = "selectSetOne(selectedSet1)">
-                  <option ng-repeat = "option in setsProps | filter : filterProps" value="{{option.name}}"  >
-                      {{option.name}}
-                  </option>
-              </select>
-
-              <select ng-model = "selectedSet2" ng-change = "selectSetTwo(selectedSet2)" ng-if = "selectedSet1">
-                  <option ng-repeat = "option in setsProps | filter : filterProps" value="{{option.name}}"  >
-                      {{option.name}}
-                  </option>
-              </select>
-
-              <select ng-model = "selectedSet3" ng-change = "selectSetThree(selectedSet3)" ng-if = "needSetThree">
-                  <option ng-repeat = "option in setsProps | filter : filterPropsSetThree" value="{{option.name}}"  >
-                      {{option.name}}
-                  </option>
-              </select>
-
-              <button ng-click = "dressForHero()">
-                  Find Best Mods
-              </button>
-              <button ng-click = "resetMods()">
-                  Reset Best Mods
-              </button>
-
-              <br>
-              <br>
-
-              FREEZED MODS ON HEROES (click on name to remove)
-              <div ng-repeat = "fHero in frezedHeroes | orderBy:'name'" ng-click = "unFrezeHero(fHero.name)">
-                  {{fHero.name}}
-              </div>
-              <br>
-              <br>
-              <div>
-
-                  <div ng-repeat = "set in variantOfSets">
-                      +++++++++++++++++SETS add speed : {{variantOfSets.addSpeed}} ++++++++++++++++++
-                      <div ng-repeat = "fMods in set">
-                         <br>
-
-                          <!--{{fMods[0]}}-->
-                          <div ng-repeat = "mods in fMods">
-                              >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                              <div ng-repeat = "mod in mods"  >
-                                  {{mod.forma}} {{mod.set}} {{mod.hero}} + {{mod.addSpeed}} speed
-
-                              </div>
-                              >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                          </div>
-
-                      </div>
-
-                  </div>
-
-              </div>
-
-
-          </div>
-
-          </div>
-
-
-      </div>
-  </div>
+    </div>
+</div>
+</div>
 
 </body>
 </html>
@@ -177,7 +231,6 @@
 <!--&lt;!&ndash;DELETE&ndash;&gt;-->
 <!--&lt;!&ndash;</button>&ndash;&gt;-->
 <!--</div>-->
-
 
 
 <!--<div style="float: left; width: 50%">-->

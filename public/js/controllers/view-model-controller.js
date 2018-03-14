@@ -219,10 +219,86 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
         //console.log(vm.myMods);
     };
 
+    vm.modsFilter = function () {
+        vm.viewModel = 4;
+        vm.modsFiltered = [].concat(vm.mods);
+        vm.modForm = ["Any"].concat(modForma);
+        vm.modSets = [{name : "Any"}].concat(vm.setsProps);
+        vm.modMains = ["Any"].concat(createModMain());
 
 
+    };
 
 
+    vm.modFormaChanged = function (selectedModForma) {
+        console.log("Mod Forma = ", selectedModForma);
+        vm.selectedModForma = selectedModForma;
+        createModMain();
+        applyFilters();
+    };
+
+    vm.modSetChanged = function (selectedModSet) {
+        vm.selectedModSet = selectedModSet;
+        createModMain();
+        applyFilters();
+    };
+
+    vm.modMainChanged = function (selectedModMain) {
+        vm.selectedModMain = selectedModMain;
+        applyFilters();
+    };
+
+
+    vm.resetFilters = function () {
+        vm.selectedModForma = null;
+    };
+
+
+    vm.applyAllFilters = function () {
+
+    };
+
+
+    function createModMain() {
+        let result = [];
+        vm.modsFiltered = [].concat(vm.mods);
+        if (vm.selectedModForma && vm.selectedModForma !== "Any") {
+            vm.modsFiltered = vm.modsFiltered.filter(mod => mod.forma === vm.selectedModForma);
+        } else {
+
+        }
+
+        if (vm.selectedModSet && vm.selectedModSet !== "Any") {
+            vm.modsFiltered = vm.modsFiltered.filter(mod => mod.set === vm.selectedModSet);
+        }
+
+        vm.modsFiltered.forEach(mod => {
+            if (!result.some(res => res === mod.mainStat)) {
+                result.push(mod.mainStat)
+            }
+        });
+
+        return result
+    }
+
+    function applyFilters() {
+        vm.modsFiltered = [].concat(vm.mods);
+
+        if (vm.selectedModForma && vm.selectedModForma !== "Any") {
+            vm.modsFiltered = vm.modsFiltered.filter(mod => mod.forma === vm.selectedModForma);
+        }
+
+
+        if (vm.selectedModSet && vm.selectedModSet !== "Any") {
+            vm.modsFiltered = vm.modsFiltered.filter(mod => mod.set === vm.selectedModSet);
+        }
+
+
+        if (vm.selectedModMain && vm.selectedModMain.name !== "Any") {
+            vm.modsFiltered = vm.modsFiltered.filter(mod => mod.mainStat === vm.selectedModMain);
+        }
+
+    };
 
     socket.on('size', function (data) {
         vm.collectionSize = data;
