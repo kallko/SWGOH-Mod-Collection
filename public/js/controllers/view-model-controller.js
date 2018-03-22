@@ -58,8 +58,8 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     let currentUser = localStorage.getItem('currentUser');
     // localStorage.setItem('currentUser', vm.gameId);
 
-    //socket = io.connect('http://93.183.200.136:9021');
-    socket = io.connect('http://localhost:9021');
+    socket = io.connect('http://93.183.200.136:9021');
+    //socket = io.connect('http://localhost:9021');
 
     console.log("CURRENT USER ", currentUser);
 
