@@ -71,7 +71,7 @@ io.on('connection', function (socket) {
     socket.on('newUserData', function(login){
 
         console.log("User connected ", login);
-        console.log("User parameters ", !!bigData[login], bigData[login].started, bigData[login].finished, );
+        //console.log("User parameters ", !!bigData[login], bigData[login].started, bigData[login].finished, );
 
         if (bigData[login] && bigData[login].finished) {
 
