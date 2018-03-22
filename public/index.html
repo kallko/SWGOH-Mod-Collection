@@ -36,6 +36,9 @@
                 <button ng-click="modsFilter()" ng-show="mods.length > 0" title="Find mods with known parameters"> Find
                     Mods
                 </button>
+                <button ng-click="heroNeedMod()" ng-show="mods.length > 0" title="Find powerful hero without full mods"> Find
+                    Heroes Without mods
+                </button>
             </div>
             <br>
             <br>
@@ -191,6 +194,19 @@
 
                     </div>
 
+                </div>
+            </div>
+        </div>
+
+        <div ng-if="viewModel === 5">
+
+            This is 20 most powerfull heroes without 6 mods
+            <br>
+            <br>
+
+            <div ng-if ="heroFiltered.length > 0">
+                <div ng-repeat = "hero in heroFiltered ">
+                    {{hero.name}} progress: {{hero.progress}} %,  mods : {{hero.mods.length}}
                 </div>
             </div>
         </div>

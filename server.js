@@ -18,6 +18,8 @@ const router = require('./server/serverRouter'),
 
 console.log(new Date());
 
+
+
 let hrParser  = new HtmlResultParser();
 let dataCalc  = new DataCalc();
 
@@ -27,6 +29,8 @@ app.use('/', router);
 server.listen(port);
 
 console.info('Listening on port ' + (port) + '...\n');
+
+
 
 
 const setsProps = [
@@ -51,11 +55,13 @@ let mods,
     units,
     generalData,
     bigData = {},
+    smallData = {},
     heroesCollection = [];
 
+loadGuildMembers();
 
 loadAllHeroes();
-
+createUpdate();
 
 
 
@@ -63,9 +69,16 @@ io.on('connection', function (socket) {
 
 
     socket.on('newUserData', function(login){
+
         console.log("User connected ", login);
+        console.log("User parameters ", !!bigData[login], bigData[login].started, bigData[login].finished, );
 
         if (bigData[login] && bigData[login].finished) {
+
+            //console.log("bigData second", JSON.stringify(bigData[login]));
+            //
+            // console.log("heroes", bigData[login].heroes.length);
+            // console.log("collection", bigData[login].collection.length);
 
             socket.emit("heroes", bigData[login])
 
@@ -74,10 +87,10 @@ io.on('connection', function (socket) {
             if (bigData[login] &&  bigData[login].started) {
 
             } else {
-                bigData[login] = {};
+                bigData[login] = bigData[login] || {};
                 bigData[login].started = true;
-                bigData[login].mods = [];
-                loadDataForNewUser(login, socket);
+                bigData[login].mods = bigData[login].mods || [];
+                loadDataForNewUser(bigData, login, socket);
             }
 
         }
@@ -176,8 +189,11 @@ function loadAllHeroes() {
 }
 
 
-function loadDataForNewUser(login, socket) {
+function loadDataForNewUser(container, login, socket) {
 
+
+    container[login] = container[login] || [];
+    container[login].mods = [];
 
     let url = "https://swgoh.gg/u/" + login + "/collection/";
 
@@ -189,8 +205,15 @@ function loadDataForNewUser(login, socket) {
                 return;
             }
 
+            if (body.indexOf('9 й ЛЕГИОН') !== -1) {
+                addGuildMember(login);
+            }
+
+
+
             let heroForParsing = html2json(body);
-            bigData[login].heroes = hrParser.heroParser(heroForParsing);
+            //console.log(JSON.stringify(heroForParsing));
+            container[login].heroes = hrParser.heroParser(heroForParsing);
         } else {
             console.log("ERROR " + error);
         }
@@ -204,6 +227,8 @@ function loadDataForNewUser(login, socket) {
 
     function modeRequest(login, i) {
         console.log("SEND REQ ", i);
+        container[login].mods =  container[login].mods || [];
+        console.log( "230 ", container[login].mods.length);
         //https://swgoh.gg/u/dominnique/mods/
 
         let url = 'https://swgoh.gg/u/' + login + '/mods/?page=' + (++i);
@@ -213,22 +238,39 @@ function loadDataForNewUser(login, socket) {
                 //console.log("received ModData ", body);
                 if (body.indexOf('Not Found') === -1) {
                     modRequestIndex++;
-                    modPreparsed  = html2json(body);
-                    if (modPreparsed.child[1]) {
-                        bigData[login].mods = bigData[login].mods.concat(hrParser.modeParser(modPreparsed.child[1]));
+                    modPreparsed = html2json(body);
+                    if (modPreparsed.child[1] && hrParser.modeParser(modPreparsed.child[1])) {
+                        container[login].mods = container[login].mods.concat(hrParser.modeParser(modPreparsed.child[1]));
+                        console.log( "243 ", container[login].mods.length);
+
                         modeRequest(login, modRequestIndex);
                     } else {
-                        socket.emit('errorSWOGH');
+                        if (socket) {
+                            socket.emit('errorSWOGH');
+                        }
                     }
 
                 } else {
 
-                    if (bigData[login].mods && bigData[login].mods.length > 0 && bigData[login].heroes && bigData[login].heroes.length > 0) {
-                        joinModsAndUnits(bigData[login].mods, bigData[login].heroes);
-                        bigData[login].collection = heroesCollection;
-                        bigData[login].finished = true;
-                        bigData[login].heroes = dataCalc.calcSets(bigData[login].heroes, heroesCollection, setsProps);
-                        socket.emit("heroes", bigData[login]);
+                    if (container[login].mods && container[login].mods.length > 0 && container[login].heroes && container[login].heroes.length > 0) {
+                        joinModsAndUnits(container[login].mods, container[login].heroes);
+                        container[login].collection = heroesCollection;
+                        container[login].finished = true;
+                        container[login].started = true;
+                        container[login].heroes = dataCalc.calcSets(container[login].heroes, heroesCollection, setsProps);
+
+                        if (socket) {
+                            socket.emit("heroes", container[login]);
+                        } else {
+                            bigData[login].mods =  JSON.parse(JSON.stringify(container[login].mods));
+                            console.log( "265 ", bigData[login].mods.length);
+
+                            bigData[login].collection =  JSON.parse(JSON.stringify(container[login].collection));
+                            bigData[login].heroes =  JSON.parse(JSON.stringify(container[login].heroes));
+                            bigData[login].started =  true;
+                            bigData[login].finished =  true;
+
+                        }
                     }
                 }
             } else {
@@ -254,10 +296,62 @@ function loadDataForNewUser(login, socket) {
 }
 
 
+function loadGuildMembers() {
+    setTimeout(() => {
+        Schemas.guild.collection.find({}).toArray(function (err, result) {
+
+            if (err) throw err;
+            createDataForGuild(result);
+
+        });
+    }, 1000)
+}
 
 
+function createDataForGuild(members) {
+    members.forEach(member => {
+        if (!bigData[member.name]) {
+            bigData[member.name] = {};
+        }
+    });
+    updateDataFromServer();
+}
+
+function createUpdate() {
+    console.log("CREATE TASK for Update");
+    setTimeout(updateDataFromServer,  4 * 60 * 60 * 1000); //
+}
+
+function updateDataFromServer() {
+    console.log("Start Update");
+    let i = 0;
+    smallData = {};
+    for (let key in bigData) {
+        console.log("Member", key);
+        if (bigData[key].finished || !bigData[key].started) {
+            setTimeout(() => {loadDataForNewUser(smallData, key)}, i * 60 * 1000)
+            //loadDataForNewUser(smallData, key);
+            i++;
+        }
+    }
+    createUpdate();
+}
 
 
+function addGuildMember(login) {
+    Schemas.guild.collection.find({name: login}).toArray(function (err, result) {
+
+        if (err) throw err;
+
+        if (result.length === 0) {
+            let toSave = new Schemas.guild({
+                name: login,
+            });
+            toSave.save();
+        }
+    });
+
+}
 // function calculateSets(units, heroesCollection) {
 //     if (heroesCollection && heroesCollection.length > 0 ){
 //

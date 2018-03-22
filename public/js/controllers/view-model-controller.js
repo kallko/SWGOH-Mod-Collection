@@ -58,8 +58,8 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     let currentUser = localStorage.getItem('currentUser');
     // localStorage.setItem('currentUser', vm.gameId);
 
-    socket = io.connect('http://93.183.200.136:9021');
-    //socket = io.connect('http://localhost:9021');
+    //socket = io.connect('http://93.183.200.136:9021');
+    socket = io.connect('http://localhost:9021');
 
     console.log("CURRENT USER ", currentUser);
 
@@ -70,13 +70,9 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     }
 
 
-    vm.heroes = [
-    ];
+    vm.heroes = [];
 
-   // vm.modForms = ["arrow", "square", "rhombus", "triangle", "circle", "cross"];
-   // vm.modSets = ["health", "defence", "c-damage", "c-chance", "resistance", "offence", "efficient", "speed"];
     vm.myMods = [];
-
 
     vm.createNewUnit = function () {
 
@@ -141,7 +137,6 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
 
             });
 
-            console.log(modForma[i], " ", bestMod.length);
             vm.bestMods = vm.bestMods.concat(bestMod);
             console.log(vm.bestMods.length);
         }
@@ -178,6 +173,15 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     };
 
 
+    vm.heroNeedMod = function() {
+
+        vm.viewModel = 5;
+        vm.heroFiltered = [];
+        vm.heroFiltered = vm.heroes.filter(hero => hero.mods.length < 6);
+        vm.heroFiltered.length = vm.heroFiltered.length > 20 ? 20 : vm.heroFiltered.length
+
+    };
+
     // socket.on('units', function (data) {
     //     vm.heroes = data.heroes;
     //     vm.mods = data.mods;
@@ -187,6 +191,7 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     // });
 
     socket.on('heroes', function (data) {
+        console.log("DATA ", data);
             vm.heroes = data.heroes;
             vm.mods = data.mods;
             vm.heroesCollection = data.collection;
@@ -391,7 +396,7 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     };
 
     vm.setsCount = function () {
-        console.log("setsCount ", vm.setsForBestMods[0].count + vm.setsForBestMods[1].count <= 4);
+        //console.log("setsCount ", vm.setsForBestMods[0].count + vm.setsForBestMods[1].count <= 4);
         return vm.setsForBestMods[0].count + vm.setsForBestMods[1].count <= 4;
     };
 

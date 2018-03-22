@@ -7,7 +7,6 @@ function dataCalc (){
 }
 
 dataCalc.prototype.calcSets = function (units, heroesCollection, setsProps) {
-    console.log("START CALC SETS 1");
     if (heroesCollection && heroesCollection.length > 0 ){
 
         console.log("START CALC SETS");

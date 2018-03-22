@@ -43,8 +43,13 @@ let Mod = new mongoose.Schema(({
     speed: Number,
 }));
 
+let Guild = new mongoose.Schema(({
+    name : String,
+}));
+
 module.exports = {
     mods: mongoose.model('mods', Mod),
-    units: mongoose.model('swus', SWU)
+    units: mongoose.model('swus', SWU),
+    guild: mongoose.model('guild', Guild)
 };
 

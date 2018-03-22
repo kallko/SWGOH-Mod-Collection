@@ -35,6 +35,9 @@ htmlResultParser.prototype.heroColectionParser = function (htmlData) {
             htmlData.child[1].child[3].child[15].child[3].child[3].child[1].child[i].attr.class.some(clas => clas === 'character')) {
 
 
+            //console.log(JSON.stringify(htmlData.child[1].child[3].child[15].child[3].child[3].child[1].child[i].child[1]));
+
+
             hero.name = htmlData.child[1].child[3].child[15].child[3].child[3].child[1].child[i].child[1].child[3].child[3].child[0].text;
             hero.speed = htmlData.child[1].child[3].child[15].child[3].child[3].child[1].child[i].child[1].child[7].child[5].child[0].text;
             hero.health = htmlData.child[1].child[3].child[15].child[3].child[3].child[1].child[i].child[1].child[7].child[3].child[0].text;
@@ -64,11 +67,13 @@ htmlResultParser.prototype.heroParser = function (htmlData) {
 
             try {
 
-                hero.name =     block.child[i].child[1].child[5].child[0].child[0].text;
-                hero.maxPower = block.child[i].child[1].child[3].attr.title[3];
+                hero.name =      block.child[i].child[1].child[5].child[0].child[0].text;
+                hero.maxPower =  block.child[i].child[1].child[3].attr.title[3];
                 hero.realPower = block.child[i].child[1].child[3].attr.title[1];
-                hero.level = block.child[i].child[1].child[1].child[1].child[19].child[0].text;
-                hero.tir = block.child[i].child[1].child[1].child[1].child[21].child[0].text;
+                hero.level =     block.child[i].child[1].child[1].child[1].child[19].child[0].text;
+                hero.tir =       block.child[i].child[1].child[1].child[1].child[21].child[0].text;
+                hero.progress = parseInt(parseInt(hero.realPower)/parseInt(hero.maxPower) * 100);
+
                 result.push(hero);
             } catch (e) {
                 console.log (" ERROR ");
@@ -87,11 +92,18 @@ htmlResultParser.prototype.heroParser = function (htmlData) {
 
 htmlResultParser.prototype.modeParser = function (htmlData) {
     let result = [];
-    let errorMods = [];
+    //let errorMods = [];
 
     let i = 0;
-    let modsArray = htmlData.child[3].child[15].child[3].child[3].child[1].child[5].child[1];
-    while (modsArray.child[i] !== undefined) {
+    let modsArray;
+    try {
+        modsArray = htmlData.child[3].child[15].child[3].child[3].child[1].child[5].child[1];
+    } catch (e) {
+        console.log( "Some Error");
+        return false;
+    }
+
+    while (modsArray && modsArray.child[i] !== undefined) {
         if (modsArray.child[i].attr) {
             let mod = {};
             let j = 0;
