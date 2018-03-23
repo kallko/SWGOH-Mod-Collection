@@ -369,7 +369,7 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
 
 
     vm.adminTest = function () {
-        console.log(vm.setsCount());
+        //console.log(vm.setsCount());
 
         socket.emit("admin");
     };
@@ -395,10 +395,10 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
         vm.setsForBestMods[2] = vm.setsProps.find(set => set.name === setName);
     };
 
-    vm.setsCount = function () {
-        //console.log("setsCount ", vm.setsForBestMods[0].count + vm.setsForBestMods[1].count <= 4);
-        return vm.setsForBestMods[0].count + vm.setsForBestMods[1].count <= 4;
-    };
+    // vm.setsCount = function () {
+    //     //console.log("setsCount ", vm.setsForBestMods[0].count + vm.setsForBestMods[1].count <= 4);
+    //     return vm.setsForBestMods[0].count + vm.setsForBestMods[1].count <= 4;
+    // };
 
     vm.filterProps = function (item) {
         return item.count > 0;
