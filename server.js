@@ -228,7 +228,7 @@ function loadDataForNewUser(container, login, socket) {
     function modeRequest(login, i) {
         console.log("SEND REQ ", i);
         container[login].mods =  container[login].mods || [];
-        console.log( "230 ", container[login].mods.length);
+        //console.log( "230 ", container[login].mods.length);
         //https://swgoh.gg/u/dominnique/mods/
 
         let url = 'https://swgoh.gg/u/' + login + '/mods/?page=' + (++i);
@@ -241,7 +241,7 @@ function loadDataForNewUser(container, login, socket) {
                     modPreparsed = html2json(body);
                     if (modPreparsed.child[1] && hrParser.modeParser(modPreparsed.child[1])) {
                         container[login].mods = container[login].mods.concat(hrParser.modeParser(modPreparsed.child[1]));
-                        console.log( "243 ", container[login].mods.length);
+                        //console.log( "243 ", container[login].mods.length);
 
                         modeRequest(login, modRequestIndex);
                     } else {
@@ -263,7 +263,7 @@ function loadDataForNewUser(container, login, socket) {
                             socket.emit("heroes", container[login]);
                         } else {
                             bigData[login].mods =  JSON.parse(JSON.stringify(container[login].mods));
-                            console.log( "265 ", bigData[login].mods.length);
+                            //console.log( "265 ", bigData[login].mods.length);
 
                             bigData[login].collection =  JSON.parse(JSON.stringify(container[login].collection));
                             bigData[login].heroes =  JSON.parse(JSON.stringify(container[login].heroes));
@@ -297,6 +297,7 @@ function loadDataForNewUser(container, login, socket) {
 
 
 function loadGuildMembers() {
+
     setTimeout(() => {
         Schemas.guild.collection.find({}).toArray(function (err, result) {
 
@@ -329,7 +330,7 @@ function updateDataFromServer() {
     for (let key in bigData) {
         console.log("Member", key);
         if (bigData[key].finished || !bigData[key].started) {
-            setTimeout(() => {loadDataForNewUser(smallData, key)}, i * 60 * 1000)
+            setTimeout(() => {loadDataForNewUser(smallData, key)}, 3 * i * 60 * 1000);
             //loadDataForNewUser(smallData, key);
             i++;
         }
