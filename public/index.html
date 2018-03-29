@@ -39,6 +39,9 @@
                 <button ng-click="heroNeedMod()" ng-show="mods.length > 0" title="Find powerful hero without full mods"> Find
                     Heroes Without mods
                 </button>
+                <button ng-click="sithRaid()" ng-show="mods.length > 0" title="Show different ways to gain max damage on sith raid">
+                    SithRaid
+                </button>
             </div>
             <br>
             <br>
@@ -209,6 +212,12 @@
                     {{hero.name}} progress: {{hero.progress}} %,  mods : {{hero.mods.length}}
                 </div>
             </div>
+        </div>
+        <div ng-if="viewModel === 6">
+            <div ng-repeat = "text in textsForSithRaid ">
+                {{text}}
+            <br>
+            <br>
         </div>
 
     </div>

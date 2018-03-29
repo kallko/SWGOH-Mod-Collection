@@ -178,6 +178,7 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
         vm.viewModel = 5;
         vm.heroFiltered = [];
         vm.heroFiltered = vm.heroes.filter(hero => hero.mods.length < 6);
+        vm.heroFiltered.sort(compareDevelop);
         vm.heroFiltered.length = vm.heroFiltered.length > 20 ? 20 : vm.heroFiltered.length
 
     };
@@ -193,7 +194,8 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     socket.on('heroes', function (data) {
         console.log("DATA ", data);
             vm.heroes = data.heroes;
-            vm.mods = data.mods;
+            vm.mods = [];
+            vm.heroes.forEach(hero => vm.mods = vm.mods.concat(hero.mods));
             vm.heroesCollection = data.collection;
             vm.heroes.forEach(hero => hero.name = hero.name.replace(/&quot;/g, '\"'));
             vm.mods.forEach(mod => mod.hero = mod.hero.replace(/&quot;/g, '\"'));
@@ -491,6 +493,51 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
 
     };
 
+    vm.sithRaid = function() {
+        vm.viewModel = 6;
+        console.log("START ACTION");
+
+        const squads = {
+            phaseOneMain : [["Rey (Jedi Training)", "Rey (Scavenger)", "BB-8", "Resistance Trooper", "Visas Marr"], ["Rey (Jedi Training)", "Rey (Scavenger)", "BB-8", "Resistance Trooper", "Hermit Yoda"]],
+            phaseTwoMain :[["General Veers", "Colonel Starck", "Snowtrooper", "Grand Admiral Thrawn", "Shoretrooper"]],
+            phaseThreeMain :[["Commander Luke Skywalker", "Han Solo", "Pao", "Death Trooper", "Chirrut Îmwe"]],
+            phaseFourMain :[["Asajj Ventress", "Old Daka", "Talia", "Nightsister Acolyte", "Mother Talzin"], ["Asajj Ventress", "Old Daka", "Talia", "Nightsister Acolyte", "Nightsister Zombie"], ["Asajj Ventress", "Old Daka", "Talia", "Nightsister Acolyte", "Nightsister Initiate"]],
+
+            phaseOneReserve :[["Grand Admiral Thrawn", "Jawa Engineer", "Hera Syndulla", "First Order Officer", "Hermit Yoda"]],
+            phaseTwoReserve :[["General Veers", "Colonel Starck", "Snowtrooper", "Magmatrooper", "Shoretrooper"]],
+            phaseThreeReserve :[["Commander Luke Skywalker", "Han Solo", "Pao", "Death Trooper", "Chirrut Îmwe"]],
+            phaseFourReserve :[["Asajj Ventress", "Old Daka", "Talia", "Nightsister Acolyte", "Mother Talzin"], ["Asajj Ventress", "Old Daka", "Talia", "Nightsister Acolyte", "Nightsister Zombie"], ["Asajj Ventress", "Old Daka", "Talia", "Nightsister Acolyte", "Nightsister Initiate"]],
+
+        };
+
+        vm.textsForSithRaid = [];
+
+        for (let key in squads){
+            console.log("KEY ", key);
+            squads[key].forEach((squad, index) => {
+               let text = "" +key + ' ' + (index + 1) + "=> ";
+               let teamPower = 0;
+               let teamMembers = 0;
+               squad.forEach(soldier => {
+                   let  realSoldier = vm.heroes.find(hero => hero.name === soldier);
+                   if (realSoldier) {
+                       text += realSoldier.name + " " + realSoldier.progress + "% ";
+                       teamPower += realSoldier.progress;
+                       teamMembers++;
+                   } else {
+                       text += soldier + " 0% ";
+                   }
+               });
+
+                text += teamMembers === 5 ? " avg. team power " + parseInt(teamPower/5) + "%"  : "Not Exist Squad";
+                vm.textsForSithRaid.push(text);
+            });
+        }
+
+        console.log("textsForSithRaid");
+        console.log(vm.textsForSithRaid);
+    };
+
     function showNeedUpgradeMods(mods) {
       //vm.needUpgradeMods = mods.filter(mod => isSpeedReceiver(mod));
       vm.needUpgradeMods = mods.filter(mod => isSpeedReceiver(mod) || haveAdditionalSpeed(mod));
@@ -663,3 +710,6 @@ function findBestMod(mods) {
     return result;
 }
 
+function compareDevelop(alpha, betta) {
+    return betta.progress - alpha.progress;
+}

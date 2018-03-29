@@ -73,6 +73,7 @@ htmlResultParser.prototype.heroParser = function (htmlData) {
                 hero.level =     block.child[i].child[1].child[1].child[1].child[19].child[0].text;
                 hero.tir =       block.child[i].child[1].child[1].child[1].child[21].child[0].text;
                 hero.progress = parseInt(parseInt(hero.realPower)/parseInt(hero.maxPower) * 100);
+                hero.progress = hero.progress > 100 ? parseInt(hero.progress / 100) : hero.progress;
 
                 result.push(hero);
             } catch (e) {

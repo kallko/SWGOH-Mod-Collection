@@ -246,6 +246,8 @@ function loadDataForNewUser(container, login, socket) {
                         modeRequest(login, modRequestIndex);
                     } else {
                         if (socket) {
+                            container[login].finished = true;
+                            container[login].started = true;
                             socket.emit('errorSWOGH');
                         }
                     }
