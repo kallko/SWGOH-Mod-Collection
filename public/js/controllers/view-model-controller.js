@@ -360,6 +360,9 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     };
 
     vm.loadNewData = function () {
+        vm.mods = [];
+        vm.heroes = [];
+        vm.heroesCollection = [];
         vm.viewModel  = 0;
         vm.needUpgradeMods = [];
         currentUser = vm.user;
@@ -498,7 +501,7 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
         console.log("START ACTION");
 
         const squads = {
-            phaseOneMain : [["Rey (Jedi Training)", "Rey (Scavenger)", "BB-8", "Resistance Trooper", "Visas Marr"], ["Rey (Jedi Training)", "Rey (Scavenger)", "BB-8", "Resistance Trooper", "Hermit Yoda"]],
+            phaseOneMain : [["Rey (Jedi Training)", "Rey (Scavenger)", "BB-8", "Resistance Trooper", "R2-D2"], ["Rey (Jedi Training)", "Rey (Scavenger)", "BB-8", "Resistance Trooper", "R2-D2"]],
             phaseTwoMain :[["General Veers", "Colonel Starck", "Snowtrooper", "Grand Admiral Thrawn", "Shoretrooper"]],
             phaseThreeMain :[["Commander Luke Skywalker", "Han Solo", "Pao", "Death Trooper", "Chirrut Îmwe"]],
             phaseFourMain :[["Asajj Ventress", "Old Daka", "Talia", "Nightsister Acolyte", "Mother Talzin"], ["Asajj Ventress", "Old Daka", "Talia", "Nightsister Acolyte", "Nightsister Zombie"], ["Asajj Ventress", "Old Daka", "Talia", "Nightsister Acolyte", "Nightsister Initiate"]],
