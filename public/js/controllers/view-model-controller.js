@@ -501,12 +501,12 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
         console.log("START ACTION");
 
         const squads = {
-            phaseOneMain : [["Rey (Jedi Training)", "Rey (Scavenger)", "BB-8", "Resistance Trooper", "R2-D2"], ["Rey (Jedi Training)", "Rey (Scavenger)", "BB-8", "Resistance Trooper", "R2-D2"]],
+            phaseOneMain : [["Rey (Jedi Training)", "Rey (Scavenger)", "BB-8", "Resistance Trooper", "R2-D2"]],
             phaseTwoMain :[["General Veers", "Colonel Starck", "Snowtrooper", "Grand Admiral Thrawn", "Shoretrooper"]],
             phaseThreeMain :[["Commander Luke Skywalker", "Han Solo", "Pao", "Death Trooper", "Chirrut Îmwe"]],
             phaseFourMain :[["Asajj Ventress", "Old Daka", "Talia", "Nightsister Acolyte", "Mother Talzin"], ["Asajj Ventress", "Old Daka", "Talia", "Nightsister Acolyte", "Nightsister Zombie"], ["Asajj Ventress", "Old Daka", "Talia", "Nightsister Acolyte", "Nightsister Initiate"]],
 
-            phaseOneReserve :[["Grand Admiral Thrawn", "Jawa Engineer", "Hera Syndulla", "First Order Officer", "Hermit Yoda"]],
+            phaseOneReserve :[["Grand Admiral Thrawn", "Jawa Engineer", "Hera Syndulla", "First Order Officer", "Hermit Yoda"], ["Rey (Jedi Training)", "Rey (Scavenger)", "BB-8", "Resistance Trooper", "Hermit Yoda"]],
             phaseTwoReserve :[["General Veers", "Colonel Starck", "Snowtrooper", "Magmatrooper", "Shoretrooper"]],
             phaseThreeReserve :[["Commander Luke Skywalker", "Han Solo", "Pao", "Death Trooper", "Chirrut Îmwe"]],
             phaseFourReserve :[["Asajj Ventress", "Old Daka", "Talia", "Nightsister Acolyte", "Mother Talzin"], ["Asajj Ventress", "Old Daka", "Talia", "Nightsister Acolyte", "Nightsister Zombie"], ["Asajj Ventress", "Old Daka", "Talia", "Nightsister Acolyte", "Nightsister Initiate"]],

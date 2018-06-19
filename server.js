@@ -205,7 +205,7 @@ function loadDataForNewUser(container, login, socket) {
                 return;
             }
 
-            if (body.indexOf('9 й ЛЕГИОН') !== -1) {
+            if (body.indexOf('第九军团') !== -1) {
                 addGuildMember(login);
             }
 
