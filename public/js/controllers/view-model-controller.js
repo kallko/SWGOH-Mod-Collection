@@ -21,12 +21,7 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     vm.setsForBestMods = [];
     vm.needSetThree = false;
     vm.variantOfSets = [];
-    // vm.selectedSecondSet;
-    // vm.selectedFirstdSet;
-
-    // const {DataCalc} = import ('./server/dataCalc');
-    // //let dataCalc  = new DataCalc();
-
+    vm.guild = [];
 
 
 
@@ -56,10 +51,11 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
 
     let allMods = [];
     let currentUser = localStorage.getItem('currentUser');
+    let GUILD;
     // localStorage.setItem('currentUser', vm.gameId);
 
-    socket = io.connect('http://93.183.200.136:9021');
-    //socket = io.connect('http://localhost:9021');
+    //socket = io.connect('http://93.183.200.136:9021');
+    socket = io.connect('http://localhost:1976');
 
     console.log("CURRENT USER ", currentUser);
 
@@ -109,41 +105,23 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
 
     vm.findNeedUpgradeMods = function () {
         vm.viewModel = 1;
+		socket.emit('upgradeModsForDefence', currentUser);
         showNeedUpgradeMods(vm.mods);
         //vm.$apply();
     };
 
-    vm.findBestMods = function () {
+    vm.findFarmMods = function () {
         vm.viewModel = 2;
         vm.bestMods = [];
-        let tempMMods = [].concat(vm.mods);
-        for (let i in modForma) {
-            let maxSpeed = 0;
-            let bestMod = [];
-            tempMMods.forEach(mod => {
-
-                if (mod.forma === modForma[i] && mod.addSpeed === maxSpeed) {
-                    bestMod.push(mod)
-                }
-
-                if (mod.forma === modForma[i] && mod.addSpeed > maxSpeed) {
-                    bestMod = bestMod.filter(best => best.forma !== modForma[i]);
-
-                    maxSpeed = mod.addSpeed;
-                    bestMod.push(mod);
-                }
-
-
-
-            });
-
-            vm.bestMods = vm.bestMods.concat(bestMod);
-            console.log(vm.bestMods.length);
-        }
-        console.log(vm.viewModel, "BestMods ", vm.bestMods);
+		socket.emit('getModsForFarming', currentUser)
     };
 
-
+    //todo frontend display
+	socket.on('getModsForFarmingResponse', function (data) {
+		console.log('!!!!!! ', data);
+		// vm.needUpgradeMods = data;
+		// vm.$apply();
+	});
 
     vm.modsConstructor = function () {
         console.log("Constructor mode");
@@ -165,6 +143,14 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
        alert("BAD LOGIN");
     });
 
+    socket.on('upgradeModsForDefenceResponse', function (data) {
+       console.log('!!!!!! ', data);
+		vm.needUpgradeMods = data;
+		vm.$apply();
+    });
+
+
+
     vm.unFrezeHero = function (name) {
         let hero = vm.frezedHeroes.find(fHero => fHero.name === name);
         vm.unFrezedHeroes.push(hero);
@@ -172,16 +158,27 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
 
     };
 
+    //deprecated
+    // vm.heroNeedMod = function() {
+    //
+    //     vm.viewModel = 5;
+    //     vm.heroFiltered = [];
+    //     vm.heroFiltered = vm.heroes.filter(hero => hero.mods.length < 6);
+    //     vm.heroFiltered.sort(compareDevelop);
+    //     vm.heroFiltered.length = vm.heroFiltered.length > 20 ? 20 : vm.heroFiltered.length
+    //
+    // };
+	vm.findColorUpMods = function() {
+		vm.viewModel = 5;
+		vm.heroFiltered = [];
+		socket.emit('getColorUpMods', vm.user); // getColorUpModsResponse
+	};
 
-    vm.heroNeedMod = function() {
-
-        vm.viewModel = 5;
-        vm.heroFiltered = [];
-        vm.heroFiltered = vm.heroes.filter(hero => hero.mods.length < 6);
-        vm.heroFiltered.sort(compareDevelop);
-        vm.heroFiltered.length = vm.heroFiltered.length > 20 ? 20 : vm.heroFiltered.length
-
-    };
+	socket.on('getColorUpModsResponse', function (data) {
+		console.log('!!!!!! let it be', data);
+		vm.guild = data;
+		vm.$apply();
+	});
 
     // socket.on('units', function (data) {
     //     vm.heroes = data.heroes;
@@ -193,19 +190,19 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
 
     socket.on('heroes', function (data) {
         console.log("DATA ", data);
-            vm.heroes = data.heroes;
+            vm.heroes = data;
             vm.mods = [];
             vm.heroes.forEach(hero => vm.mods = vm.mods.concat(hero.mods));
             vm.heroesCollection = data.collection;
             vm.heroes.forEach(hero => hero.name = hero.name.replace(/&quot;/g, '\"'));
-            vm.mods.forEach(mod => mod.hero = mod.hero.replace(/&quot;/g, '\"'));
-            vm.heroesCollection.forEach(hero => hero.name = hero.name.replace(/&quot;/g, '\"'));
+            // vm.mods.forEach(mod => mod.hero = mod.hero.replace(/&quot;/g, '\"'));
+            // vm.heroesCollection.forEach(hero => hero.name = hero.name.replace(/&quot;/g, '\"'));
 
         vm.viewModel = 1;
         vm.$apply();
         console.log("RECEIVED ", vm.heroes);
         let i = 0;
-        vm.mods.forEach(mod => mod.id = ++i);
+        // vm.mods.forEach(mod => mod.id = ++i);
         console.log("RECEIVED ", vm.mods);
         console.log("RECEIVED ", vm.heroesCollection);
 
@@ -215,9 +212,15 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
 
     socket.on('mods', function (data) {
         allMods = data;
-        vm.$apply();
-        console.log(allMods)
+		console.log('Receive mods', allMods);
+		vm.mods = allMods;
+		vm.$apply();
     });
+
+	socket.on('guild', function (data) {
+		GUILD = data;
+		console.log('guild received', GUILD[0]);
+	});
 
 
     vm.changeModFilter = function () {
@@ -369,13 +372,12 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
         vm.admin = currentUser === "kalko";
         console.log("user ", currentUser);
         localStorage.setItem('currentUser', currentUser);
-        socket.emit('newUserData', currentUser);
+        // socket.emit('newUserData', currentUser);
+        socket.emit('requestForMods', currentUser);
     };
 
 
     vm.adminTest = function () {
-        //console.log(vm.setsCount());
-
         socket.emit("admin");
     };
 
@@ -543,8 +545,14 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
 
     function showNeedUpgradeMods(mods) {
       //vm.needUpgradeMods = mods.filter(mod => isSpeedReceiver(mod));
-      vm.needUpgradeMods = mods.filter(mod => isSpeedReceiver(mod) || haveAdditionalSpeed(mod));
-       console.log("mods for upgrade ", vm.needUpgradeMods);
+      const tempMods = mods.filter(mod => !isSpeedReceiver(mod) && !haveAdditionalSpeed(mod));
+       console.log("mods for upgrade ", tempMods);
+		vm.needUpgradeMods = [];
+		// tempMods.forEach(tMod => {
+		//     if (!vm.needUpgradeMods.some(name => name === tMod.character)){
+		//         vm.needUpgradeMods.push(tMod.character)
+        //     }
+        // });
        // let secondLineMods = mods.filter(mod => (parseInt(mod.level) < 3 ));
        // vm.needUpgradeMods = vm.needUpgradeMods.concat(secondLineMods);
        //  console.log("needUpgradeMods ", vm.needUpgradeMods);
@@ -553,16 +561,20 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
     }
 
 function isSpeedReceiver(mod) {
-        return mod.forma === "Receiver" && parseInt(mod.level) < 15 && mod.mainStat === "Speed";
+        return mod.primary_stat.name === 'Speed';
 }
+
+// function haveAdditionalSpeed(mod) {
+//     return  (parseInt(mod.level) < 3 && mod.firstStat === "Speed") ||
+//             (parseInt(mod.level) < 6 && (mod.firstStat === "Speed" || mod.secondStat === "Speed")) ||
+//             (parseInt(mod.level) < 9 && (mod.firstStat === "Speed" || mod.secondStat === "Speed" || mod.thirdStat === "Speed")) ||
+//             (parseInt(mod.level) < 12 && (mod.firstStat === "Speed" || mod.secondStat === "Speed"|| mod.thirdStat === "Speed" || mod.forthStat === "Speed"))
+// }
+
 
 function haveAdditionalSpeed(mod) {
-    return  (parseInt(mod.level) < 3 && mod.firstStat === "Speed") ||
-            (parseInt(mod.level) < 6 && (mod.firstStat === "Speed" || mod.secondStat === "Speed")) ||
-            (parseInt(mod.level) < 9 && (mod.firstStat === "Speed" || mod.secondStat === "Speed" || mod.thirdStat === "Speed")) ||
-            (parseInt(mod.level) < 12 && (mod.firstStat === "Speed" || mod.secondStat === "Speed"|| mod.thirdStat === "Speed" || mod.forthStat === "Speed"))
-}
-
+    return  mod.secondary_stats.some(secondaryStat => secondaryStat.name === 'Speed');
+    }
 
 function createFilterForVariants() {
 

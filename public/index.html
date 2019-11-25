@@ -18,17 +18,17 @@
         <div>
             <div>
 
-                Input your login on "https://swgoh.gg/" and push "Load"
+                Input your login on "https://swgoh.gg/" and click "Load"
                 <input type="text" ng-model="user">
                 <button ng-click="loadNewData()"> LOAD</button>
                 <button ng-click="adminTest()" ng-show="admin"> admin</button>
                 <br>
                 <br>
                 <button ng-click="findNeedUpgradeMods()" ng-show="mods.length > 0"
-                        title="All mods you can upgrade with additional speed"> need Upgrade
+                        title="All mods you can upgrade with additional speed"> Units with mods without speed
                 </button>
-                <button ng-click="findBestMods()" ng-show="mods.length > 0"
-                        title="Best mods each form with additional speed"> bestMods
+                <button ng-click="findFarmMods()" ng-show="mods.length > 0"
+                        title="Find set, that You need to farm"> What to Farm?
                 </button>
                 <button ng-click="modsConstructor()" ng-show="mods.length > 0" title="Find best set of mods for hero">
                     Constructor
@@ -36,8 +36,7 @@
                 <button ng-click="modsFilter()" ng-show="mods.length > 0" title="Find mods with known parameters"> Find
                     Mods
                 </button>
-                <button ng-click="heroNeedMod()" ng-show="mods.length > 0" title="Find powerful hero without full mods"> Find
-                    Heroes Without mods
+                <button ng-click="findColorUpMods()" ng-show="mods.length > 0" title="Find mods that have to be coloredUp"> ColorUp modules for guild
                 </button>
                 <button ng-click="sithRaid()" ng-show="mods.length > 0" title="Show different ways to gain max damage on sith raid">
                     SithRaid
@@ -48,13 +47,17 @@
 
 
         </div>
-        <div ng-if="viewModel === 1">
-            MODS CAN BE UPGRADED WITH SPEED + :
+        <div ng-if="viewModel === 1 && needUpgradeMods.length">
+            You need to change mods for this units:
             <br>
             <br>
-            <div ng-repeat="mod in needUpgradeMods">
-                {{$index + 1}} {{mod.forma}} -- {{mod.set}} -- {{mod.hero}} -- {{mod.level}} level -- {{mod.mainStat ===
-                "Speed" ? "MAIN GOAL" : ""}}
+            <div ng-repeat="unit in needUpgradeMods">
+                <!--{{$index + 1}} {{mod.forma}} &#45;&#45; {{mod.set}} &#45;&#45; {{mod.hero}} &#45;&#45; {{mod.level}} level &#45;&#45; {{mod.mainStat ===-->
+                <!--"Speed" ? "MAIN GOAL" : ""}}-->
+                {{unit.name}}
+                <div ng-repeat="point in unit.points">
+                    &#45;&#45;{{point}}
+                </div>
 
             </div>
         </div>
@@ -203,13 +206,16 @@
 
         <div ng-if="viewModel === 5">
 
-            This is 20 most powerfull heroes without 6 mods
+            Mods can be coloredUp:
             <br>
             <br>
 
-            <div ng-if ="heroFiltered.length > 0">
-                <div ng-repeat = "hero in heroFiltered ">
-                    {{hero.name}} progress: {{hero.progress}} %,  mods : {{hero.mods.length}}
+            <div ng-if ="guild.length > 0">
+                <div ng-repeat = "member in guild ">
+                    >>{{member.name}} << {{member.bestModsCount}} / {{member.mods.length}}
+                    <div ng-repeat = "mod in member.mods ">
+                        &#45;&#45;{{mod.character}} in {{mod.slot}}
+                    </div>
                 </div>
             </div>
         </div>

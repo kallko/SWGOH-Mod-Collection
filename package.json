@@ -10,7 +10,10 @@
     "chalk": "^2.3.1",
     "express": "^4.16.2",
     "html2json": "^1.0.2",
+    "lodash": "^4.17.15",
     "mongoose": "^5.0.6",
+    "node-fetch": "^2.6.0",
+    "r2": "^2.0.1",
     "request": "^2.83.0",
     "socket.io": "^2.0.4"
   }
