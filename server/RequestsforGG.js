@@ -1,6 +1,5 @@
 const fetch = require("node-fetch");
 
-
 const loadData = (module.exports =  {
 	getAllHeroes: async function () {
 		const url = 'https://swgoh.gg/api/characters/';
@@ -13,7 +12,6 @@ const loadData = (module.exports =  {
 		const url = 'https://swgoh.gg/api/players/'+ allyCode + '/mods/';
 		const result = await fetch(url);
 		const resp = await result.json();
-		// console.log(resp.mods.length, ' Mods loaded');
 		return resp.mods;
 	},
 	getPlayer: async function (allyCode) {

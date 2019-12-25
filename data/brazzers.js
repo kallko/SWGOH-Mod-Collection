@@ -46,11 +46,15 @@ const brazzers = [
 	{id: 874732765, name: 'Zoom'},
 	{id: 389358452, name: 'Madseen'},
 	{id: 592988817, name: 'Nox'},
-	{id: 128159354, name: 'RIBA'},
+	// {id: 128159354, name: 'RIBA'},
 	{id: 138917713, name: 'இZiP0dஊ'},
 	{id: 335127754, name: 'FiGeR'},
 	{id: 321778664, name: 'ΞU MrZ'},
 	{id: 121124467, name: 'xZiP0d'},
+	{id: 855341647, name: 'KingParty123'},
+	{id: 371746578, name: 'DarthCheGuevara'},
+	{id: 373859945, name: 'Dart Velvet'},
+	{id: 878496627, name: 'Darien Fox'},
 ];
 
 

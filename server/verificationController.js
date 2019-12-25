@@ -26,7 +26,7 @@ const modsController = (module.exports =  {
 			});
 			let fieldNames = hero.possibleSets.concat([hero.secondary]).concat(hero.triangle).concat(hero.arrow).concat(hero.cross).concat(hero.circle).concat(hero.square).concat(hero.romb);
 			fieldNames = fieldNames.filter(n => n);
-			let wrong = fieldNames.filter(fName => !MOD.secondary.some(m => m === fName));
+			let wrong = fieldNames.filter(fName => fName !== 'Critical Avoidance' && !MOD.secondary.some(m => m === fName));
 			if (wrong.length > 0) {
 				result.push('Wrong field name ', wrong);
 			}

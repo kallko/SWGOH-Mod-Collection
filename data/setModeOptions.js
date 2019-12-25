@@ -6,7 +6,7 @@ const options =
 				possibleSets: ['Speed', 'Critical Chance'],
 				completeSets: true,
 				arrow: ['Speed'],
-				secondary: 'Defense'
+				secondary: 'Offense'
 			},
 			{
 				name: 'GRANDMASTERYODA',
@@ -25,28 +25,25 @@ const options =
 			},
 			{
 				name: 'JOLEEBINDO',
-				possibleSets: ['Speed', 'Health', ],
+				possibleSets: ['Speed', 'Health'],
 				completeSets: true,
 				secondary: 'Health',
-				triangle: ['Critical Damage'],
 				cross: ['Tenacity'],
 				arrow:['Speed']
 			},
-			{
-				name: 'GENERALKENOBI',
-				possibleSets: ['Defense'],
-				completeSets: true,
-				arrow:['Speed'],
-				cross: ['Defense', 'Protection', 'Tenacity'],
-				secondary: 'Tenacity'
-			},
+			// {
+			// 	name: 'GENERALKENOBI',
+			// 	possibleSets: ['Defense'],
+			// 	completeSets: true,
+			// 	arrow:['Speed'],
+			// 	secondary: 'Protection'
+			// },
 			{
 				name: 'BOSSK',
 				possibleSets: ['Tenacity'],
 				completeSets: true,
 				arrow:['Speed'],
 				secondary: 'Health',
-				cross: ['Defense', 'Protection', 'Tenacity'],
 			},
 			{
 				name: 'HANSOLO',
@@ -65,11 +62,19 @@ const options =
 				cross: ['Potency'],
 			},
 			{
+				name: 'DARTHREVAN',
+				possibleSets: ['Speed', 'Potency'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Potency',
+				triangle: ['Critical Damage']
+			},
+			{
 				name: 'SITHASSASSIN',
 				possibleSets: ['Speed', 'Critical Chance'],
 				completeSets: true,
 				arrow:['Speed'],
-				secondary: 'Critical Chance',
+				secondary: 'Offense',
 				triangle: ['Critical Damage'],
 			},
 			{
@@ -80,19 +85,11 @@ const options =
 				secondary: 'Potency',
 			},
 			{
-				name: 'DARTHREVAN',
-				possibleSets: ['Speed', 'Potency'],
-				completeSets: true,
-				arrow:['Speed'],
-				secondary: 'Potency',
-				triangle: ['Critical Damage']
-			},
-			{
 				name: 'DARTHMALAK',
 				possibleSets: ['Tenacity'],
 				completeSets: true,
-				arrow:['Speed'],
-				secondary: 'Tenacity',
+				arrow:['Critical Avoidance'],
+				secondary: 'Health',
 			},
 			{
 				name: 'SITHMARAUDER',
@@ -104,24 +101,38 @@ const options =
 				cross: ['Offense'],
 			},
 			{
-				name: 'GEONOSIANBROODALPHA',
+				name: 'ANAKINKNIGHT',
+				possibleSets: ['Speed', 'Critical Chance'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Critical Chance',
+				triangle: ['Critical Chance']
+			},
+			{
+				name: 'AHSOKATANO',
 				possibleSets: ['Speed', 'Health'],
 				completeSets: true,
 				arrow:['Speed'],
-				secondary: 'Health',
+				secondary: 'Protection',
+			},
+			{
+				name: 'CT5555',
+				possibleSets: ['Health', "Defense"],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Protection',
+			},
+			{
+				name: 'GEONOSIANBROODALPHA',
+				possibleSets: ['Speed', 'Critical Chance'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Critical Chance',
 				cross: ['Health'],
 			},
 			{
 				name: 'GEONOSIANSOLDIER',
-				possibleSets: ['Speed', 'Potency'],
-				completeSets: true,
-				arrow:['Speed'],
-				secondary: 'Potency',
-				cross: ['Potency'],
-			},
-			{
-				name: 'POGGLETHELESSER',
-				possibleSets: ['Potency', 'Health'],
+				possibleSets: ['Speed', 'Critical Chance'],
 				completeSets: true,
 				arrow:['Speed'],
 				secondary: 'Potency',
@@ -136,6 +147,14 @@ const options =
 				triangle: ['Critical Damage'],
 			},
 			{
+				name: 'POGGLETHELESSER',
+				possibleSets: ['Potency', 'Health'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Potency',
+				cross: ['Potency'],
+			},
+			{
 				name: 'SUNFAC',
 				possibleSets: ['Health', 'Defense'],
 				completeSets: true,
@@ -144,7 +163,7 @@ const options =
 			},
 			{
 				name: 'BOBAFETT',
-				possibleSets: ['Potency', 'Critical Chance'],
+				possibleSets: ['Health', 'Critical Chance'],
 				completeSets: true,
 				arrow:['Speed'],
 				secondary: 'Offense',
@@ -160,7 +179,7 @@ const options =
 				cross: ['Potency'],
 			},
 			{
-				name: 'CADBANE',
+				name: 'DENGAR',
 				possibleSets: ['Critical Chance'],
 				completeSets: true,
 				arrow:['Speed'],
@@ -168,15 +187,313 @@ const options =
 				triangle: ['Critical Chance'],
 			},
 			{
-				name: 'DENGAR',
-				possibleSets: ['Critical Chance'],
+				name: 'CADBANE',
+				possibleSets: ['Critical Chance', 'Speed'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Offense',
+			},
+			{
+				name: 'DARTHTRAYA',
+				possibleSets: ['Speed', 'Defense'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Defense',
+			},
+			{
+				name: 'VADER',
+				possibleSets: ['Speed', 'Potency'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Critical Chance',
+				triangle: ['Critical Damage']
+			},
+			{
+				name: 'EMPERORPALPATINE',
+				possibleSets: ['Potency', 'Speed'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Potency',
+				cross: ['Potency'],
+			},
+			{
+				name: 'DARTHSION',
+				possibleSets: ['Speed', 'Defense'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Potency',
+			},
+			{
+				name: 'DARTHNIHILUS',
+				possibleSets: ['Speed', 'Health'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Protection',
+			},
+			{
+				name: 'PADMEAMIDALA',
+				possibleSets: ['Speed', 'Health'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Protection',
+			},
+			{
+				name: 'MACEWINDU',
+				possibleSets: ['Defense', 'Health'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Protection',
+			},
+			{
+				name: 'JEDIKNIGHTCONSULAR',
+				possibleSets: ['Health'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Protection',
+			},
+			{
+				name: 'COMMANDERLUKESKYWALKER',
+				possibleSets: ['Speed', 'Potency'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Potency',
+			},
+			{
+				name: 'STORMTROOPERHAN',
+				possibleSets: ['Defense'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Protection',
+			},
+			{
+				name: 'EZRABRIDGERS3',
+				possibleSets: ['Speed', 'Critical Chance'],
 				completeSets: true,
 				arrow:['Speed'],
 				secondary: 'Critical Chance',
 			},
+			{
+				name: 'CARTHONASI',
+				possibleSets: ['Speed', 'Critical Chance'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Critical Chance',
+			},
+			{
+				name: 'CANDEROUSORDO',
+				possibleSets: ['Offense', 'Critical Chance'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Potency',
+			},
+			{
+				name: 'ZAALBAR',
+				possibleSets: ['Defense', 'Health'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Critical Chance',
+			},
+			{
+				name: 'MISSIONVAO',
+				possibleSets: ['Offense', "Health"],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Health',
+			},
+			{
+				name: 'JUHANI',
+				possibleSets: ['Health', 'Defense'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Critical Chance',
+			},
+			{
+				name: 'SABINEWRENS3',
+				possibleSets: ['Speed', 'Potency'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Potency',
+			},
+			{
+				name: 'HERASYNDULLAS3',
+				possibleSets: ['Speed', "Defense"],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Health',
+			},
+			{
+				name: 'CHOPPERS3',
+				possibleSets: ['Defense', 'Health'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Protection',
+			},
+			{
+				name: 'ZEBS3',
+				possibleSets: ['Speed', 'Potency'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Health',
+			},
+			{
+				name: 'KANANJARRUSS3',
+				possibleSets: ['Defense', 'Health'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Health',
+			},
+			{
+				name: 'SHAAKTI',
+				possibleSets: ['Health', 'Speed'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Health',
+			},
+			{
+				name: 'CLONESERGEANTPHASEI',
+				possibleSets: ['Critical Damage', 'Health'],
+				completeSets: true,
+				arrow:['Speed'],
+				triangle: ['Critical Damage'],
+				secondary: 'Offense',
+			},
+			{
+				name: 'CT7567',
+				possibleSets: ['Speed', "Critical Chance"],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Critical Chance',
+			},
+			{
+				name: 'CT210408',
+				possibleSets: ["Critical Chance", "Critical Damage"],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Offense',
+			},
+			{
+				name: 'MOTHERTALZIN',
+				possibleSets: ["Potency"],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Potency',
+			},
+			{
+				name: 'DAKA',
+				possibleSets: ["Speed", "Health"],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Potency',
+			},
+			{
+				name: 'NIGHTSISTERZOMBIE',
+				possibleSets: ['Defense', 'Tenacity', 'Health'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Health',
+			},
+			{
+				name: 'ASAJVENTRESS',
+				possibleSets: ["Critical Chance", "Potency"],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Potency',
+			},
+			{
+				name: 'NIGHTSISTERSPIRIT',
+				possibleSets: ["Potency"],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Potency',
+			},
+			{
+				name: 'GRANDMOFFTARKIN',
+				possibleSets: ["Potency", "Health"],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Potency',
+			},
+			{
+				name: 'GRANDADMIRALTHRAWN',
+				possibleSets: ["Health", "Potency",],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Protection',
+			},
+			{
+				name: 'TIEFIGHTERPILOT',
+				possibleSets: [ "Health"],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Potency',
+			},
+			{
+				name: 'ROYALGUARD',
+				possibleSets: ["Defense"],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Protection',
+			},
+			{
+				name: 'IMPERIALPROBEDROID',
+				possibleSets: ["Health"],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Defense',
+			},
+			{
+				name: 'JYNERSO',
+				possibleSets: ["Health", "Critical Chance"],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Critical Chance',
+			},
+			{
+				name: 'OLDBENKENOBI',
+				possibleSets: ["Defense", "Health"],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Potency',
+			},
+			{
+				name: 'R2D2_LEGENDARY',
+				possibleSets: ["Potency"],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Potency',
+			},
+			{
+				name: 'CASSIANANDOR',
+				possibleSets: ["Potency", "Health"],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Potency',
+			},
+			{
+				name: 'K2SO',
+				possibleSets: ["Defense", "Health"],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Protection',
+			},
+			{
+				name: 'KYLORENUNMASKED',
+				possibleSets: ["Health"],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Health',
+			},
+			{
+				name: 'FIRSTORDERTIEPILOT',
+				possibleSets: [ 'Defense',  'Potency', 'Health', ],
+				completeSets: true,
+				// arrow:['Speed'],
+				secondary: 'Critical Chance',
+				// triangle: ['Critical Damage']
+			},
 		],
 	blockedHeroes: [
-		'ADMIRALACKBAR'
+		'ADMIRALACKBAR', 'GENERALKENOBI'
 	]}
 ;
 
@@ -223,6 +540,230 @@ const options =
 // 			'ADMIRALACKBAR', 'HANSOLO', 'CHEWBACCALEGENDARY'
 // 		]}
 // ;
+
+// const options =
+// 	{
+// 		heroes:[
+// 			{
+// 				name: 'EMPERORPALPATINE',
+// 				possibleSets: ['Speed', 'Potency'],
+// 				completeSets: true,
+// 				arrow: ['Speed'],
+// 				secondary: 'Potency'
+// 			},
+// 			{
+// 				name: 'VADER',
+// 				possibleSets: ['Speed', 'Potency'],
+// 				completeSets: true,
+// 				secondary: 'Potency',
+// 				arrow:['Speed']
+// 			},
+// 			{
+// 				name: 'DARTHTRAYA',
+// 				possibleSets: ['Speed', 'Health', 'Defense'],
+// 				completeSets: true,
+// 				secondary: 'Protection',
+// 				arrow:['Speed']
+// 			},
+// 			{
+// 				name: 'DARTHSION',
+// 				possibleSets: ['Speed', 'Health', 'Defense'],
+// 				completeSets: true,
+// 				secondary: 'Protection',
+// 				arrow:['Speed']
+// 			},
+// 			{
+// 				name: 'DARTHNIHILUS',
+// 				possibleSets: ['Speed', 'Health'],
+// 				completeSets: true,
+// 				triangle: ['Critical Damage'],
+// 				arrow:['Speed'],
+// 				secondary: 'Protection'
+// 			}
+// 		],
+// 		blockedHeroes: [
+// 		]}
+// ;
+
+
+// // todo Shaman
+// const options =
+// 	{
+// 		heroes:[
+// 			{
+// 				name: 'BASTILASHANDARK',
+// 				possibleSets: ['Speed', 'Critical Chance', 'Defense', 'Tenacity', 'Offense', 'Potency', 'Health', 'Critical Damage'],
+// 				completeSets: false,
+// 				arrow: ['Speed'],
+// 				secondary: 'Potency'
+// 			},
+// 			{
+// 				name: 'DARTHREVAN',
+// 				possibleSets: ['Speed', 'Potency'],
+// 				completeSets: true,
+// 				secondary: 'Offense',
+// 				arrow:['Speed'],
+// 				triangle: ['Critical Damage']
+// 			},
+// 			// {
+// 			// 	name: 'DARTHMALAK',
+// 			// 	possibleSets: ['Tenacity'],
+// 			// 	completeSets: true,
+// 			// 	secondary: 'Protection',
+// 			// 	arrow:['Speed'],
+// 			// 	// cross: ['Tenacity']
+// 			// },
+// 			// {
+// 			// 	name: 'SITHTROOPER',
+// 			// 	possibleSets: ['Health', 'Defense'],
+// 			// 	completeSets: true,
+// 			// 	secondary: 'Health',
+// 			// 	arrow:['Speed'],
+// 			// 	cross: ['Tenacity']
+// 			//
+// 			// },
+// 			{
+// 				name: 'HK47',
+// 				possibleSets: ['Critical Damage', 'Critical Chance'],
+// 				completeSets: true,
+// 				triangle: ['Critical Damage'],
+// 				arrow:['Speed'],
+// 				secondary: 'Offense'
+// 			},
+// 			{
+// 				name: 'PADMEAMIDALA',
+// 				possibleSets: ['Health'],
+// 				completeSets: true,
+// 				triangle: ['Health'],
+// 				arrow:['Health'],
+// 				cross: ['Health'],
+// 				secondary: 'Health'
+// 			},
+// 			{
+// 				name: 'ANAKINKNIGHT',
+// 				possibleSets: ['Critical Damage', 'Critical Chance'],
+// 				completeSets: true,
+// 				triangle: ['Offense'],
+// 				cross:['Offense'],
+// 				arrow:['Speed'],
+// 				secondary: 'Offense'
+// 			},
+// 			{
+// 				name: 'AHSOKATANO',
+// 				possibleSets: ['Offense', 'Critical Chance'],
+// 				completeSets: true,
+// 				triangle: ['Offense'],
+// 				arrow:['Speed'],
+// 				cross:['Offense'],
+// 				secondary: 'Offense'
+// 			},
+// 			{
+// 				name: 'GENERALKENOBI',
+// 				possibleSets: ['Speed', 'Health'],
+// 				completeSets: true,
+// 				arrow:['Speed'],
+// 				secondary: 'Protection'
+// 			},
+// 			{
+// 				name: 'CT7567',
+// 				possibleSets: ['Speed', 'Health'],
+// 				completeSets: true,
+// 				triangle: ['Critical Damage'],
+// 				arrow:['Speed'],
+// 				cross:['Offense'],
+// 				secondary: 'Offense'
+// 			},
+// 			{
+// 				name: 'JEDIKNIGHTREVAN',
+// 				possibleSets: ['Speed', 'Critical Chance'],
+// 				completeSets: true,
+// 				arrow:['Speed'],
+// 				secondary: 'Offense'
+// 			},
+// 			{
+// 				name: 'GRANDMASTERYODA',
+// 				possibleSets: ['Offense', 'Critical Chance'],
+// 				completeSets: true,
+// 				triangle: ['Critical Damage'],
+// 				arrow:['Speed'],
+// 				secondary: 'Critical Chance'
+// 			},
+// 			{
+// 				name: 'BASTILASHAN',
+// 				possibleSets: ['Speed', 'Health'],
+// 				completeSets: true,
+// 				arrow:['Speed'],
+// 				secondary: 'Offense'
+// 			},
+// 			{
+// 				name: 'JOLEEBINDO',
+// 				possibleSets: ['Speed', 'Health'],
+// 				completeSets: true,
+// 				cross: ['Tenacity'],
+// 				arrow:['Speed'],
+// 				secondary: 'Health'
+// 			},
+// 			{
+// 				name: 'HERMITYODA',
+// 				possibleSets: ['Speed', 'Critical Chance', 'Defense', 'Tenacity', 'Offense', 'Potency', 'Health', 'Critical Damage'],
+// 				completeSets: false,
+// 				arrow:['Speed'],
+// 				secondary: 'Health'
+// 			},
+// 			{
+// 				name: 'GEONOSIANBROODALPHA',
+// 				possibleSets: ['Speed', 'Health'],
+// 				completeSets: true,
+// 				cross: ['Health'],
+// 				arrow:['Speed'],
+// 				secondary: 'Health'
+// 			},
+// 			{
+// 				name: 'GEONOSIANSOLDIER',
+// 				possibleSets: ['Speed', 'Potency'],
+// 				completeSets: true,
+// 				cross: ['Potency'],
+// 				arrow:['Speed'],
+// 				secondary: 'Potency'
+// 			},
+// 			{
+// 				name: 'POGGLETHELESSER',
+// 				possibleSets: ['Potency', 'Speed'],
+// 				completeSets: true,
+// 				cross: ['Potency'],
+// 				arrow:['Speed'],
+// 				secondary: 'Potency'
+// 			},
+// 			{
+// 				name: 'GEONOSIANSPY',
+// 				possibleSets: ['Speed', 'Critical Chance'],
+// 				completeSets: true,
+// 				triangle: ['Critical Damage'],
+// 				arrow:['Speed'],
+// 				secondary: 'Critical Chance'
+// 			},
+// 			{
+// 				name: 'SUNFAC',
+// 				possibleSets: ['Health', 'Defense'],
+// 				completeSets: true,
+// 				arrow:['Speed'],
+// 				secondary: 'Protection'
+// 			},
+// 			{
+// 				name: 'GRANDADMIRALTHRAWN',
+// 				possibleSets: [],
+// 				completeSets: false,
+// 				arrow:['Speed'],
+// 				secondary: 'Health'
+// 			},
+// 		],
+// 		blockedHeroes: [
+// 			'SITHTROOPER', 'DARTHMALAK', 'GRIEVOUS'
+// 		]}
+// ;
+
+
+
 
 
 

@@ -1,5 +1,8 @@
 const MOD = require ('../data/mod');
+const tritonMods = require ('../data/tritonMods');
+const triton = require ('../data/triton');
 const GUILD = require ('../data/brazzers');
+const STATS = require ('../data/stats');
 const loadData = require ('./RequestsforGG');
 const lodash = require('lodash');
 let currentSecondary = 'test';
@@ -69,7 +72,11 @@ const modsController = (module.exports =  {
 		units = concatUnitsAndMods(units, mods);
 		units.forEach((unit, index) => {
 			const arrowMod = unit.data.mods.find(mod => mod.slot === 2);
-			if (arrowMod && ((arrowMod.primary_stat.name !== 'Speed' && unit.data.base_id !== 'GRIEVOUS') || (arrowMod.primary_stat.name === 'Speed' && arrowMod.primary_stat.value < 300000))) {
+			if (arrowMod && ((arrowMod.primary_stat.name !== 'Speed'
+				&& unit.data.base_id !== 'GRIEVOUS')
+				|| (arrowMod.primary_stat.name === 'Speed'
+					&& arrowMod.primary_stat.value < 300000))
+			) {
 				addModForFarming(unit, arrowMod, fleet, arena, settings, index);
 			}
 			if (unit.data.mods) {
@@ -97,7 +104,8 @@ const modsController = (module.exports =  {
 		console.log('Members ', members);
 		for (let i = 0; i < members.length; i++) {
 			let mods = await loadData.getAllMods(members[i].id);
-			const bestModsCount = mods.filter(mod => mod.secondary_stats.some(second => second.name === 'Speed' && second.value / 10000 >= 20)).length;
+			const bestModsCount = mods.filter(mod => mod.secondary_stats.some
+			(second => second.name === 'Speed' && second.value / 10000 >= 20)).length;
 			mods = mods.filter(mod => mod.rarity === 5 && mod.slot !== 2);
 			mods = mods.filter(mod =>  {
 				const minSpeed = MOD.speedForUpgrade[mod.tier];
@@ -118,104 +126,154 @@ const modsController = (module.exports =  {
 	},
 	creator: async function (options, id) {
 		let result = {};
+		//todo offline
+		// let mods = [].concat(tritonMods.mods);
+		// const player = JSON.parse(JSON.stringify(triton));
 		let mods = await loadData.getAllMods(id);
-		const existingMods = JSON.parse(JSON.stringify(mods));
 		const player = await loadData.getPlayer(id);
+		const existingMods = JSON.parse(JSON.stringify(mods));
 		let forms = [].concat(MOD.form);
 		forms.shift();
 		const units = player.units;
 		units.forEach(unit => {
 			unit.data.speed = getExistingSpeed(mods, unit);
-			unit.data.fromMods = getExistingSecondary(mods, unit, 'Health');
+			unit.data.fromMods = getExistingSecondary(mods, unit);
+			unit.data.fromMods.forEach(secondary => {
+				let secondaryName =  Object.keys(secondary)[0];
+				let statsNumber = STATS[secondaryName];
+				let existStat = unit.data.stats['' + statsNumber];
+				let baseStat = 0;
+				switch (secondaryName) {
+					case 'Potency':
+					case 'Offense':
+					case 'Health':
+					case 'Tenacity':
+					case 'Protection':
+					case 'Critical Chance':
+					{
+						baseStat = (existStat - secondary[secondaryName].additionalSecondary) /
+							(1 + secondary[secondaryName].additionalSecondaryPercent/100 + secondary[secondaryName].secondaryFromSet/100);
+					break;
+					}
+					case 'Defense': {
+						baseStat = (existStat - secondary[secondaryName].additionalSecondaryPercent - secondary[secondaryName].additionalSecondary/10);
+						break;
+					}
+					case 'Critical Damage': {
+						if (secondaryName === 'Critical Damage' && unit.data.base_id === 'JOLEEBINDO') {
+							console.log('inside', existStat, ' ', secondary[secondaryName].additionalSecondary/100, ' ', secondary[secondaryName].secondaryFromSet/100);
+						}
+						baseStat = existStat - secondary[secondaryName].additionalSecondaryPercent/100 - secondary[secondaryName].secondaryFromSet/100;
+						break;
+					}
+					default: {
+						baseStat = 'Uncalc';
+					}
+				}
+				unit.data['base' + secondaryName] = baseStat;
+			});
 		});
 
 		const joda = units.find(unit => unit.data.base_id === 'GRANDMASTERYODA');
-		console.log('Joda ', JSON.stringify(joda.data));
-
-		console.log('mods 0 ', mods[0]);
-
-		// //todo check main preference for forma
-		// //todo rerun after sync for arrow avoid critical
-		// let  checkMain = {};
-		// mods.forEach(mod => {
-		// 	if (!checkMain[MOD.form[mod.slot]]) {
-		// 		checkMain[MOD.form[mod.slot]] = [];
-		// 	}
-		// 	checkMain[MOD.form[mod.slot]].push(mod.primary_stat.name);
-		// });
-		// for (let key in checkMain) {
-		// 	checkMain[key] = lodash.uniq(checkMain[key]);
-		// }
-		// console.log('CHECKMAIN ', JSON.stringify(checkMain));
-		// const colnel = mods.filter(mod => mod.character === 'COLONELSTARCK');
-		// console.log('COLONEL ', JSON.stringify(colnel));
-
+		// console.log('Joda ', JSON.stringify(joda.data));
 		if (options.blockedHeroes) {
 			mods.forEach(mod => mod.character);
-			mods = mods.filter(mod => !options.blockedHeroes.some(blocked => blocked === mod.character))
+			mods = mods.filter(mod => !options.blockedHeroes.some(blocked => blocked === mod.character));
 		}
 		result.blockedHeroes = [].concat(options.blockedHeroes);
 
 		options.heroes.forEach(hero => {
+			// console.log('Hero', hero.name);
 			const unit = units.find(unit => unit.data.base_id === hero.name);
-			let possibleMods = mods.filter(mod => !result.blockedHeroes.some(blocked => blocked === mod.character));
-			possibleMods = possibleMods.filter(mod => hero.possibleSets.some(pset =>{
-				let set = MOD.sets.find(m => m.id === mod.set);
-				return set.name === pset;
-			}));
-			if (unit.gear_level < 12) {
-				possibleMods = possibleMods.filter(mod => mod.rarity <= 5);
-			}
-			let bestMods = {};
-			forms.forEach((form, index) => {
-				if (form in hero) {
-					possibleMods = possibleMods.filter(mod => (mod.slot !== index + 1 || (mod.slot === index + 1 && hero[form].some(spec => spec === mod.primary_stat.name)) ))
+			if (unit) {
+				let possibleMods = mods.filter(mod => !result.blockedHeroes.some(blocked => blocked === mod.character));
+
+				possibleMods = possibleMods.filter(mod => hero.possibleSets.some(pset =>{
+					let set = MOD.sets.find(m => m.id === mod.set);
+					return set.name === pset;
+				}));
+				if (unit.data.gear_level < 12) {
+					possibleMods = possibleMods.filter(mod => mod.rarity <= 5);
 				}
-				let temp = possibleMods.filter((mod) => mod.slot === index + 1);
-				if (hero.secondary) {
-					currentSecondary = hero.secondary;
-					currentUnit = hero.name;
-				} else {
-					currentSecondary = null;
-					currentUnit = null;
-				}
-				temp.sort(sortBySpeed);
-				if (temp.length > 3 ){
-					temp = cutBestMods(temp);
-				}
-				bestMods[form] = [].concat(temp)
-			});
-			// console.log('For ', hero.name, ' best ', JSON.stringify(bestMods));
-			let bestModsForUnit = modVariator(hero.name, bestMods, hero.secondary, unit, existingMods);
-			let newSpeed = bestModsForUnit[bestModsForUnit.length - 1];
-			bestModsForUnit.pop();
-			// console.log('best mods for ', hero.name, ' ', JSON.stringify(bestModsForUnit));
-			const isNotUpgradeble = bestModsForUnit.every(mod => mod.character === hero.name);
-			// console.log(hero.name, ' isUpgradable ', isNotUpgradeble);
-			if (isNotUpgradeble) {
-				console.log('Congrats ', hero.name, ' have best mod set with speed ', newSpeed);
-			} else {
-				console.log('You could upgrade ', hero.name, ' and receive speed ', newSpeed, ' instead of ', unit.data.speed.existingSpeed + (hero.secondary ? ' and better secondary ' + hero.secondary : ''));
-				bestModsForUnit.forEach(mod => {
-					let emod = existingMods.find(eMod => eMod.id === mod.id);
-					if (emod.character !== hero.name) {
-						//todo !comment for result
-						// console.log('MOD ', MOD.form[mod.slot], ' from ', emod.character)
+				let bestMods = {};
+				forms.forEach((form, index) => {
+					if (form in hero) {
+						possibleMods = possibleMods.filter
+						(mod => (mod.slot !== index + 1 || (mod.slot === index + 1 && hero[form].some(spec => spec === mod.primary_stat.name)) ));
 					}
+
+					let temp = possibleMods.filter((mod) => mod.slot === index + 1);
+					if (hero.secondary) {
+						currentSecondary = hero.secondary;
+						currentUnit = unit;
+					} else {
+						currentSecondary = null;
+						currentUnit = null;
+					}
+					temp.sort(sortBySpeed);
+					if (temp.length > 3 ){
+						temp = cutBestMods(temp);
+					}
+					bestMods[form] = [].concat(temp);
+				});
+
+				let bestModsForUnit = modVariator(hero, bestMods, hero.secondary, unit, hero.possibleSets);
+				let newSpeed = bestModsForUnit[bestModsForUnit.length - 1];
+				bestModsForUnit.pop();
+				calculateNewStats(unit, bestModsForUnit);
+				const isNotUpgradeble = bestModsForUnit.every(mod => mod.character === hero.name);
+				if (isNotUpgradeble) {
+					console.log('Congrats ', hero.name, ' have best mod set with speed ', newSpeed);
+				} else {
+					console.log(hero.name + (hero.secondary ? ' (' + hero.secondary : '') + ') ', unit.data.speed.existingSpeed, '/', newSpeed,
+						'Health ', unit.data.stats['1'], '/', Math.round(unit.data.newHealth),
+						'Protection', unit.data.stats['28'], '/', Math.round(unit.data.newProtection),
+						'Damage', unit.data.stats['6'], '/', Math.round(unit.data.newOffense),
+						'Potency', Math.round(unit.data.stats['17'] * 100), '/', Math.round(unit.data.newPotency * 100),
+						'C-Chance',  Math.round(unit.data.stats['14']), '/', Math.round(unit.data['newCritical Chance']),
+						'C-Damage', Math.round(unit.data.stats['16'] * 100)/100, '/', Math.round(unit.data['newCritical Damage'] * 100)/100);
+					bestModsForUnit.forEach(mod => {
+						let emod = existingMods.find(eMod => eMod.id === mod.id);
+						if (emod.character !== hero.name) {
+							//todo !comment for result
+							const identifikator = mod.secondary_stats[0].name + ' ' + (('' + mod.secondary_stats[0].value).indexOf('0000') !== -1 ? mod.secondary_stats[0].value / 10000 : Math.round(mod.secondary_stats[0].value)/ 100 + '%');
+							const set = MOD.sets.find(mmm => mmm.id === mod.set);
+							// console.log('MOD ', MOD.form[mod.slot], ' from ', emod.character);
+							console.log('MOD ', MOD.form[mod.slot], ' from ', emod.character, 'SET:', set.name,
+								'Prime:', mod.primary_stat.name + ': ' + (('' + mod.primary_stat.value).indexOf('0000') !== -1 ? mod.primary_stat.value / 10000 : Math.round(mod.primary_stat.value) / 100 + '%'),
+								'Second:', identifikator,
+								'tier', mod.tier, 'rarity', mod.rarity);
+						}
+					});
+				}
+
+				mods = mods.map(mod => {
+					if (mod.character === hero.name) {
+						mod.character = '';
+					}
+					return mod;
+				});
+				bestModsForUnit.forEach(bMod => {
+					let mod = mods.find(m => m.id === bMod.id);
+					mod.character = hero.name;
 				});
 			}
-
-			mods = mods.map(mod => {
-				if (mod.character === hero.name) {
-					mod.character = '';
-				}
-				return mod;
-			});
-			bestModsForUnit.forEach(bMod => {
-				let mod = mods.find(m => m.id === bMod.id);
-				mod.character = hero.name;
-			});
 			result.blockedHeroes.push(hero.name);
+		});
+
+		let leftMods = mods.filter(mod => !result.blockedHeroes.some(blocked => blocked === mod.character));
+		let niceSpeedValue = 60000;
+		leftMods = leftMods.filter(mod => {
+			let speedStat = mod.secondary_stats.find(ss => ss.name === 'Speed');
+			let niceSpeed = speedStat ? speedStat.value >= niceSpeedValue : false;
+			return mod.character === '' && mod.slot !== 2 && niceSpeed;
+		});
+		console.log('We left behind ', leftMods.length, ' mods with speed ', niceSpeedValue/10000 + '+');
+		currentSecondary = null;
+		leftMods.sort(sortBySpeed);
+		MOD.sets.forEach(set => {
+			let quant = leftMods.filter(mod => mod.set === set.id).length;
+			console.log('For set ', set.name, ' we lost ', quant, ' mods');
 		});
 		return result
 	}
@@ -248,7 +306,9 @@ function addModForFarming(unit, mod, fleet, arena, settings, index) {
 	const heroRank = getHeroRank(unit, fleet, arena, index);
 	const limit = settings.limits.find(limit => limit.key === heroRank);
 	const set = settings.sets.find(sset => sset.id === mod.set);
-	if ((mod.primary_stat.name !== 'Speed' && unit.data.name !== 'GRIEVOUS') || (mod.primary_stat.name === 'Speed' && mod.primary_stat.value < 300000)) {
+	if ((mod.primary_stat.name !== 'Speed' && unit.data.name !== 'GRIEVOUS')
+		|| (mod.primary_stat.name === 'Speed'
+			&& mod.primary_stat.value < 300000)) {
 		return set.count+= limit.important
 	}
 	const additionalSpeed = mod.secondary_stats.find(sstat => sstat.name === 'Speed');
@@ -293,9 +353,9 @@ function sortBySpeed(first, second) {
 		let firstSpeed = first.secondary_stats.find(ss => ss.name === 'Speed') || {value: 0};
 		let secondSpeed = second.secondary_stats.find(ss => ss.name === 'Speed') || {value: 0};
 		if (secondSpeed.value - firstSpeed.value === 0 && currentSecondary && currentUnit) {
-			let firstSecondary = first.secondary_stats.find(ss => ss.name === currentSecondary) || {value: 0};
-			let secondSecondary = second.secondary_stats.find(ss => ss.name === currentSecondary) || {value: 0};
-			return secondSecondary.value - firstSecondary.value;
+			let firstSecondarytemp = getAdditionalSecondaryForUnit(first);
+			let secondSecondarytemp = getAdditionalSecondaryForUnit(second);
+			return secondSecondarytemp - firstSecondarytemp;
 		} else {
 			return secondSpeed.value - firstSpeed.value;
 		}
@@ -312,11 +372,10 @@ function sortBySpeed(first, second) {
 
 }
 
-function modVariator(hero, mods, secondary, unit, existingMods) {
+function modVariator(hero, mods, secondary, unit, possibleSets) {
 	let result = [];
 	let forms = [].concat(MOD.form);
 	forms.shift();
-	let bestChoise = {};
 	let bestSpeed = 0;
 	mods.square.forEach(mSquare => {
 		mods.arrow.forEach(mArrow => {
@@ -324,20 +383,12 @@ function modVariator(hero, mods, secondary, unit, existingMods) {
 				mods.triangle.forEach(mTriangle => {
 					mods.circle.forEach(mCircle => {
 						mods.cross.forEach(mCross => {
-							let completeSets = isCompleteSets({mSquare, mArrow, mRomb, mTriangle, mCircle, mCross});
+							let completeSets = isCompleteSets({mSquare, mArrow, mRomb, mTriangle, mCircle, mCross}, possibleSets);
 							const mods = [mSquare, mArrow, mRomb, mTriangle, mCircle, mCross];
-							if (unit.data.name === 'GENERALKENOBI') {
-								console.log('!!!!!', (!hero.completeSets || (hero.completeSets && completeSets)));
-							}
 							if (!hero.completeSets || (hero.completeSets && completeSets)) {
-								const speed = getSpeed([mSquare, mArrow, mRomb, mTriangle, mCircle, mCross], hero);
-								const setSecondary = getSecondary([mSquare, mArrow, mRomb, mTriangle, mCircle, mCross], secondary);
+								const speed = getSpeed([mSquare, mArrow, mRomb, mTriangle, mCircle, mCross]);
 								const withNewSetSpeed = Math.round(unit.data.speed.baseSpeed * (1 + speed.speedFromSet/100) + speed.additionalSpeed);
-								// console.log('unit ', unit.data.name, ' ', unit.data.speed.existingSpeed, '/', withNewSetSpeed);
-								if (unit.data.name === 'GENERALKENOBI') {
-									console.log('!!!!!', JSON.stringify(speed));
-								}
-								if (withNewSetSpeed > bestSpeed) {
+								if (withNewSetSpeed > bestSpeed ) {
 									bestSpeed = withNewSetSpeed;
 									result = mods;
 								}
@@ -352,18 +403,28 @@ function modVariator(hero, mods, secondary, unit, existingMods) {
 	return result;
 }
 
-function isCompleteSets({mSquare, mArrow, mRomb, mTriangle, mCircle, mCross}) {
+function isCompleteSets({mSquare, mArrow, mRomb, mTriangle, mCircle, mCross}, possibleSets) {
 	const modSets = [mArrow.set, mCircle.set, mCross.set, mRomb.set, mTriangle.set, mSquare.set];
+	let existSets = [];
 	let result = true;
 	modSets.forEach(set => {
 		const setCountObj = MOD.sets.find(mSet => mSet.id === set);
 		const setCount = setCountObj.setCount;
+		const setName = setCountObj.name;
 		const modSetExistCount = modSets.filter(mss => mss === set).length;
 		if (modSetExistCount % setCount !== 0) {
 			result = false;
+		} else {
+			if (!existSets.some(eSet => eSet === setName)) {
+				existSets.push(setName);
+			}
 		}
 
 	});
+	if (!possibleSets.every(es => existSets.some(ps => ps === es)))
+	{
+		return false;
+	}
 	return result;
 }
 
@@ -400,9 +461,6 @@ function getExistingSecondary(mods, unit) {
 	const name = unit.data.base_id;
 	const heroMods = mods.filter(mod => mod.character === name);
 	return MOD.secondary.map(secondary => getSecondarySet(heroMods, name, secondary));
-	// const existingSpeed = unit.data.stats['5'];
-	// const baseSpeed = Math.round((existingSpeed - speed.additionalSpeed)/(1 + speed.speedFromSet/100));
-	// return {existingSpeed, baseSpeed}
 }
 
 function getSecondary(mods, secondary) {
@@ -450,22 +508,29 @@ function getSecondary(mods, secondary) {
 
  function getSecondarySet(mods, name, secondary) {
 	 let additionalSecondaryPercent = 0;
+	 let additionalSecondary = 0;
 	 const addPrimeSecondaryPercent = mods.reduce((summ ,mod) => {
 	 	if (mod.primary_stat.name === secondary) {
-	 		return summ + mod.primary_stat.value / 100;
+	 		if (secondary === 'Defense') {
+				additionalSecondary += mod.primary_stat.value / 100;
+	 			return summ
+			} else {
+				return summ + mod.primary_stat.value / 100;
+			}
 		}
 		return summ;
 	 }, 0);
-	 let additionalSecondary = mods.reduce((summ, mod) => {
-		 const addSecSpeedStat = mod.secondary_stats.find(ss => ss.name === secondary);
-		 if (addSecSpeedStat && addSecSpeedStat.value % 10000 === 0) {
-		 	return summ + addSecSpeedStat.value / 10000;
-		 }
-		 if (addSecSpeedStat) {
-			 additionalSecondaryPercent += addSecSpeedStat.value / 100
-		 }
-		 return summ;
-	 }, 0);
+	 mods.forEach(mod => {
+		 mod.secondary_stats.forEach(ss => {
+			 if (ss.name === secondary) {
+				 if (ss.value % 10000 === 0) {
+					 additionalSecondary += ss.value / 10000;
+				 } else {
+					 additionalSecondaryPercent += ss.value / 100
+				 }
+			 }
+		 });
+	 });
 	 additionalSecondaryPercent += addPrimeSecondaryPercent;
 	 // todo calculate additional from set
 	 const set = MOD.sets.find(set => set.name === secondary);
@@ -485,8 +550,64 @@ function getSecondary(mods, secondary) {
 		 additionalSecondary += additionalSecondaryPercent/100;
 		 additionalSecondaryPercent = 0;
 	 }
-	 // console.log(name, ' ', secondary, ' Add ', additionalSecondary, ' Add% ', additionalSecondaryPercent, ' SetAdd ', secondaryFromSet);
 	 return {[secondary]:
 			 {additionalSecondaryPercent, additionalSecondary, secondaryFromSet}
 		}
+ }
+ function getAdditionalSecondaryForUnit(mod) {
+	let result = 0;
+	 let baseStatNumber = STATS[currentSecondary];
+	 let baseStat = currentUnit.data.stats[baseStatNumber];
+	switch (currentSecondary) {
+		case 'Health':
+		case 'Protection':
+		case 'Offense':
+		{
+			let addSecondaryStats = mod.secondary_stats.filter(ss => ss.name === currentSecondary);
+			let add = 0;
+			let addPercent = 0;
+			addSecondaryStats.forEach(stat => {
+				if (stat.value % 10000 === 0) {
+					add += stat.value / 10000
+				} else {
+					addPercent += stat.value / 100;
+				}
+			});
+			if (mod.primary_stat.name === currentSecondary) {
+				if (mod.primary_stat.value % 10000 === 0) {
+					add += mod.primary_stat.value / 10000
+				} else {
+					addPercent += mod.primary_stat.value / 100;
+				}
+			}
+
+			result = baseStat + add + (baseStat * addPercent/100);
+			break;
+		}
+		case 'Potency':
+		case 'Tenacity':
+		case 'Critical Chance':
+			{
+				let secondaryStat = mod.secondary_stats.find(ss => ss.name === currentSecondary);
+				if (secondaryStat) {
+					result = baseStat + secondaryStat.value /100;
+				}
+				if (mod.primary_stat.name === currentSecondary) {
+					result += mod.primary_stat.value/100;
+				}
+				break;
+			}
+		default: {
+			result = 0;
+		}
+	}
+	 return result;
+ }
+
+ function calculateNewStats(unit, mods) {
+	['Health', 'Protection', 'Offense', 'Critical Chance', 'Critical Damage', 'Potency'].forEach(secondary => {
+		let additional = getSecondarySet(mods, '', secondary)[secondary];
+		let addPercent = secondary === 'Critical Damage' ? 1 : unit.data['base'+ secondary];
+		unit.data['new'+ secondary] = unit.data['base'+ secondary] + additional.additionalSecondary + addPercent * additional.additionalSecondaryPercent/100 + addPercent * additional.secondaryFromSet/100;
+	});
  }
