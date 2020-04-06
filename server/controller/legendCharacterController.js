@@ -7,7 +7,7 @@ const {
 } = require("../../data/requirementsForUnit");
 
 module.exports = legendCharacterController = {
-	checkGuild: async function(guild = brazzers){
+	checkGuild: async function(guild = brazzers) {
 		const result = [];
 		for (let i = 0; i < guild.length; i++) {
 			const player = guild[i];
@@ -27,9 +27,9 @@ module.exports = legendCharacterController = {
 		const kayloUnits = units.filter(unit => legendUnits.some(KRunit => KRunit.base_id === unit.data.base_id));
 		const progress = legendUnits.map(krUnit => {
 			const unit = kayloUnits.find(playerUnit => playerUnit.data.base_id === krUnit.base_id);
-			return unit ? Math.min(parseInt((legendCharacterController.unitPowerCorrection(unit, mods)/krUnit.power) * 100), 100): 0;
+			return unit ? Math.min(parseInt((legendCharacterController.unitPowerCorrection(unit, mods) / krUnit.power) * 100), 100) : 0;
 		});
-		return parseInt((progress.reduce((sum, prog) => sum + prog))/progress.length);
+		return parseInt((progress.reduce((sum, prog) => sum + prog)) / progress.length);
 	},
 	printLegendResults: function (results) {
 		results.sort(sortByKylo);

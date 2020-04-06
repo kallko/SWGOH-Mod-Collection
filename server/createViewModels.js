@@ -1,11 +1,11 @@
 module.exports = CreateViewModels;
 
-function CreateViewModels (firstData){
+function CreateViewModels (firstData) {
     }
 
-CreateViewModels.prototype.createGeneralModel = function (firstData){
+CreateViewModels.prototype.createGeneralModel = function (firstData) {
     let result = {"data": []};
-    for (let i = 0; i < firstData.data.length; i++){
+    for (let i = 0; i < firstData.data.length; i++) {
         if (!result.data.some(newCity => newCity.cityName === firstData.data[i].city)) {
            result.data.push({
                 "cityName" : firstData.data[i].city
@@ -22,7 +22,7 @@ CreateViewModels.prototype.createGeneralModel = function (firstData){
                 "zip" : firstData.data[i].zip,
                 "lat" : parseFloat(firstData.data[i].lat),
                 "lon" : parseFloat(firstData.data[i].lon)
-            })
+            });
         }
     }
 
@@ -36,7 +36,7 @@ CreateViewModels.prototype.findNearestDistricts = function (data, district, leng
     let lat = district.lat;
     let lon = district.lon;
 
-    for (let i = 0; i < data.length; i++){
+    for (let i = 0; i < data.length; i++) {
         let obj;
         let distance = getDistance(data[i].lat, data[i].lon, lat, lon);
         //first 10 district will be nearest except the point
@@ -49,7 +49,6 @@ CreateViewModels.prototype.findNearestDistricts = function (data, district, leng
                 result.sort(compareDistance);
             }
         } else {
-
             //the distance have to be less than 10s element distance
             if (distance > 0 && result[length - 1] && distance < result[length - 1].distance) {
                 obj  = JSON.parse(JSON.stringify(data[i]));
@@ -63,7 +62,7 @@ CreateViewModels.prototype.findNearestDistricts = function (data, district, leng
 
     //for mor readable result
     result.forEach(city => city.distance = parseInt(city.distance));
-    return result
+    return result;
 };
 
 //find function in internet

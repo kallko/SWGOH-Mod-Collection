@@ -1,0 +1,15 @@
+{
+	"singleQuote": true,
+	"useTabs": true,
+	"trailingComma": "none",
+	"jsxBracketSameLine": false,
+	"semi": true,
+	"overrides": [
+		{
+			"files": ["package.json", "package-lock.json"],
+			"options": {
+				"useTabs": false
+			}
+		}
+	]
+}
