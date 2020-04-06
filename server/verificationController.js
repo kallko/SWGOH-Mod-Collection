@@ -24,7 +24,7 @@ const modsController = (module.exports =  {
 					result.push('Key ' + key + ' is unknown');
 				}
 			});
-			let fieldNames = hero.possibleSets.concat([hero.secondary]).concat(hero.triangle).concat(hero.arrow).concat(hero.cross).concat(hero.circle).concat(hero.square).concat(hero.romb);
+			let fieldNames = (hero.possibleSets || []).concat([hero.secondary]).concat(hero.triangle).concat(hero.arrow).concat(hero.cross).concat(hero.circle).concat(hero.square).concat(hero.romb);
 			fieldNames = fieldNames.filter(n => n);
 			let wrong = fieldNames.filter(fName => fName !== 'Critical Avoidance' && !MOD.secondary.some(m => m === fName));
 			if (wrong.length > 0) {
@@ -36,6 +36,6 @@ const modsController = (module.exports =  {
 	verificateSomerOptions: function (units, mods) {
 
 	}
-})
+});
 
 

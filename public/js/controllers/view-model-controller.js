@@ -498,6 +498,11 @@ angular.module('GermanZip').controller('viewModelController', ['$rootScope', '$s
 
     };
 
+    vm.guildWarsConstructor = function() {
+		vm.viewModel = 6;
+		console.log("START guildWarsConstructor");
+		socket.emit('guildWarsConstructor', currentUser);
+    };
     vm.sithRaid = function() {
         vm.viewModel = 6;
         console.log("START ACTION");

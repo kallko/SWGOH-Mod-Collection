@@ -177,13 +177,12 @@ const modsController = (module.exports =  {
 		const joda = units.find(unit => unit.data.base_id === 'GRANDMASTERYODA');
 		// console.log('Joda ', JSON.stringify(joda.data));
 		if (options.blockedHeroes) {
-			mods.forEach(mod => mod.character);
+			// mods.forEach(mod => mod.character);
 			mods = mods.filter(mod => !options.blockedHeroes.some(blocked => blocked === mod.character));
 		}
 		result.blockedHeroes = [].concat(options.blockedHeroes);
 
 		options.heroes.forEach(hero => {
-			// console.log('Hero', hero.name);
 			const unit = units.find(unit => unit.data.base_id === hero.name);
 			if (unit) {
 				let possibleMods = mods.filter(mod => !result.blockedHeroes.some(blocked => blocked === mod.character));
@@ -195,6 +194,12 @@ const modsController = (module.exports =  {
 				if (unit.data.gear_level < 12) {
 					possibleMods = possibleMods.filter(mod => mod.rarity <= 5);
 				}
+
+				//todo for arena teams:
+				possibleMods = possibleMods.filter(mod => mod.rarity >= 5);
+
+
+
 				let bestMods = {};
 				forms.forEach((form, index) => {
 					if (form in hero) {
@@ -239,10 +244,11 @@ const modsController = (module.exports =  {
 							const identifikator = mod.secondary_stats[0].name + ' ' + (('' + mod.secondary_stats[0].value).indexOf('0000') !== -1 ? mod.secondary_stats[0].value / 10000 : Math.round(mod.secondary_stats[0].value)/ 100 + '%');
 							const set = MOD.sets.find(mmm => mmm.id === mod.set);
 							// console.log('MOD ', MOD.form[mod.slot], ' from ', emod.character);
-							console.log('MOD ', MOD.form[mod.slot], ' from ', emod.character, 'SET:', set.name,
-								'Prime:', mod.primary_stat.name + ': ' + (('' + mod.primary_stat.value).indexOf('0000') !== -1 ? mod.primary_stat.value / 10000 : Math.round(mod.primary_stat.value) / 100 + '%'),
-								'Second:', identifikator,
-								'tier', mod.tier, 'rarity', mod.rarity);
+							//todo uncomment for info:
+						// 	console.log('MOD ', MOD.form[mod.slot], ' from ', emod.character, 'SET:', set.name,
+						// 		'Prime:', mod.primary_stat.name + ': ' + (('' + mod.primary_stat.value).indexOf('0000') !== -1 ? mod.primary_stat.value / 10000 : Math.round(mod.primary_stat.value) / 100 + '%'),
+						// 		'Second:', identifikator,
+						// 		'tier', mod.tier, 'rarity', mod.rarity);
 						}
 					});
 				}
@@ -303,8 +309,13 @@ function concatUnitsAndMods (units, mods) {
 }
 
 function addModForFarming(unit, mod, fleet, arena, settings, index) {
-	const heroRank = getHeroRank(unit, fleet, arena, index);
-	const limit = settings.limits.find(limit => limit.key === heroRank);
+	//todo old system
+	// const heroRank = getHeroRank(unit, fleet, arena, index);
+	// const limit = settings.limits.find(limit => limit.key === heroRank);
+
+	//todo new system
+	const heroRank = 'arena';
+	const limit = settings.limits.find(limit => limit.key === 'arena');
 	const set = settings.sets.find(sset => sset.id === mod.set);
 	if ((mod.primary_stat.name !== 'Speed' && unit.data.name !== 'GRIEVOUS')
 		|| (mod.primary_stat.name === 'Speed'

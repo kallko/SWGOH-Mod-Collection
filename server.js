@@ -8,6 +8,8 @@ const loadData = require ('./server/RequestsforGG');
 const GUILD = require ('./data/brazzers');
 const characters = require ('./data/characters');
 const modsController = require ('./server/modsController');
+const guildController = require ('./server/guildController');
+const legendCharacterController = require ('./server/controller/legendCharacterController');
 const verificationController = require ('./server/verificationController');
 const router = require('./server/serverRouter'),
       port = 1976;
@@ -24,15 +26,24 @@ init();
 async function init () {
 	// HEROES = JSON.parse(JSON.stringify(characters));
 	HEROES = await loadData.getAllHeroes();
-	//todo for testing
-	const options = require ('./data/setModeOptions');
-	let result = verificationController.verificateModConstructorOptions(options, HEROES);
-	console.log('Result is ', result);
-	const result2 = await modsController.creator(options, 621723826);
+
+
+	// todo for testing run mod constructor for one persone:
+	// const options = require ('./data/setModeOptions');
+	// let result = verificationController.verificateModConstructorOptions(options, HEROES);
+	// await modsController.creator(options, 621723826);
+	// const options2 = require ('./data/modEtalon');
+	// await modsController.creator(options2, 621723826);
+
+	// todoCreate squads and top lists
+	// const result3 = await guildController.createSquads();
+
 	// const result2 = await modsController.creator(options, 452867287);
 	// const result2 = await modsController.creator(options, 724256729);
 	// const result2 = await modsController.creator(options, 347317671);
-	console.log('Result 2', result);
+	// console.log('Errors', result);
+	//todo check guild progress to legend
+	legendCharacterController.checkGuild();
 }
 
 
@@ -84,6 +95,11 @@ io.on('connection', function (socket) {
 
 	socket.on('getColorUpMods', async function (allyCode) {
 		let result = await modsController.getColoredUpMods(allyCode);
+		socket.emit('getColorUpModsResponse', result);
+	});
+
+	socket.on('guildWarsConstructor', async function () {
+		let result = await guildController.createSquads();
 		socket.emit('getColorUpModsResponse', result);
 	});
 
