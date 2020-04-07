@@ -1,6 +1,7 @@
 const loadData = require("../../server/RequestsforGG");
 const brazzers = require("../../data/brazzers");
-const fs = require("fs");
+const readWriteService = require("../service/readWriteService");
+const printService = require("../service/printService");
 const {
   RAY_REQ_UNITS,
   KAYLO_REQ_UNITS,
@@ -9,7 +10,8 @@ const {
 module.exports = legendCharacterController = {
 	checkGuild: async function(guild = brazzers) {
 		const result = [];
-		for (let i = 0; i < guild.length; i++) {
+		let testLength = 2;
+		for (let i = 0; i < (testLength || guild.length); i++) {
 			const player = guild[i];
 			const units = (await loadData.getPlayer(player.id)).units;
 			const mods = await loadData.getAllMods(player.id);
@@ -21,7 +23,8 @@ module.exports = legendCharacterController = {
 				reyProgress: reyProgress
 			});
 		}
-		legendCharacterController.printLegendResults(result);
+		printService.printLegendResults(result);
+		readWriteService.saveLegendProgressForGuild(result);
 	},
 	playerProgressToLegend: async function (units, mods, legendUnits) {
 		const kayloUnits = units.filter(unit => legendUnits.some(KRunit => KRunit.base_id === unit.data.base_id));
@@ -31,36 +34,11 @@ module.exports = legendCharacterController = {
 		});
 		return parseInt((progress.reduce((sum, prog) => sum + prog)) / progress.length);
 	},
-	printLegendResults: function (results) {
-		results.sort(sortByKylo);
-		results.forEach((result, index) => console.log(index + 1, result.name, result.kyloProgress + '%'));
-		console.log();
-		results.sort(sortByRey);
-		results.forEach((result, index) => console.log(index + 1, result.name, result.reyProgress + '%'));
-		results.sort(sortByName);
-		fs.writeFile('./files/brazzers.json', JSON.stringify(results), 'utf8', (err) => {
-			if (err) {
-				return console.log(err);
-			}
-			console.log("The file was saved!");
-		});
-	},
 	unitPowerCorrection(unit, mods) {
 		const unitMods = (mods.filter(mod => mod.character === unit.data.base_id).length);
 		const modsPower = 750 * unitMods;
 		return unit.data.power - modsPower;
-
 	}
 };
 
-function sortByKylo(first, second) {
-  return second.kyloProgress - first.kyloProgress;
-}
 
-function sortByRey(first, second) {
-  return second.reyProgress - first.reyProgress;
-}
-
-function sortByName(first, second) {
-  return second.name - first.name;
-}

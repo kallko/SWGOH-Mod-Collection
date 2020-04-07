@@ -1,18 +1,18 @@
-const express = require('express'),
-    app = express(),
-    server = require('http').Server(app),
-    io = require('socket.io')(server);
+const express = require('express');
+    const app = express();
+    const server = require('http').Server(app);
+    const io = require('socket.io')(server);
 
 app.use(express.static(__dirname + '/public'));
-const loadData = require ('./server/RequestsforGG');
-const GUILD = require ('./data/brazzers');
-const characters = require ('./data/characters');
-const modsController = require ('./server/modsController');
-const guildController = require ('./server/guildController');
-const legendCharacterController = require ('./server/controller/legendCharacterController');
-const verificationController = require ('./server/verificationController');
-const router = require('./server/serverRouter'),
-      port = 1976;
+const loadData = require('./server/RequestsforGG');
+const GUILD = require('./data/brazzers');
+const characters = require('./data/characters');
+const modsController = require('./server/modsController');
+const guildController = require('./server/guildController');
+const legendCharacterController = require('./server/controller/legendCharacterController');
+const verificationController = require('./server/verificationController');
+const router = require('./server/serverRouter');
+      const port = 1976;
 
 app.use('/', router);
 server.listen(port);
@@ -47,17 +47,17 @@ async function init () {
 }
 
 
-let mods,
-    units,
-    generalData,
-    bigData = {};
+let mods;
+    let units;
+    let generalData;
+    let bigData = {};
 
 
 io.on('connection', function (socket) {
 
     console.log('Client connected');
 
-	socket.on('requestForMods', async function(allyCode){
+	socket.on('requestForMods', async function(allyCode) {
 
 		console.log("User connected with code ", allyCode );
 		const modsForUser = await loadData.getAllMods(allyCode);
@@ -69,13 +69,13 @@ io.on('connection', function (socket) {
 
     if (units) {
         console.log("Send UNIT");
-        socket.emit("units", units)
+        socket.emit("units", units);
     }
 
 
     if (mods) {
-        console.log("Send MODS" , mods);
-        socket.emit("mods", mods)
+        console.log("Send MODS", mods);
+        socket.emit("mods", mods);
     }
 
 	socket.on('upgradeModsForDefence', async function (allyCode) {
@@ -113,11 +113,5 @@ io.on('connection', function (socket) {
         }
     });
 });
-
-
-
-
-
-
 
 
