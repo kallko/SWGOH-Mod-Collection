@@ -9,10 +9,12 @@ const {
 
 module.exports = legendCharacterController = {
 	checkGuild: async function(guild = brazzers) {
-		const result = [];
-		let testLength = 2;
+		let exitingData = JSON.parse(await readWriteService.readJson('brazzers.json'));
+		let result = [];
+		let testLength;
 		for (let i = 0; i < (testLength || guild.length); i++) {
 			const player = guild[i];
+			console.log('Process ', player.name);
 			const units = (await loadData.getPlayer(player.id)).units;
 			const mods = await loadData.getAllMods(player.id);
 			const kyloProgress = await legendCharacterController.playerProgressToLegend(units, mods, KAYLO_REQ_UNITS);
@@ -23,8 +25,10 @@ module.exports = legendCharacterController = {
 				reyProgress: reyProgress
 			});
 		}
+		result = legendCharacterController.compareProgress(exitingData, result);
 		printService.printLegendResults(result);
-		readWriteService.saveLegendProgressForGuild(result);
+		exitingData.push(result);
+		readWriteService.saveLegendProgressForGuild(exitingData);
 	},
 	playerProgressToLegend: async function (units, mods, legendUnits) {
 		const kayloUnits = units.filter(unit => legendUnits.some(KRunit => KRunit.base_id === unit.data.base_id));
@@ -38,6 +42,15 @@ module.exports = legendCharacterController = {
 		const unitMods = (mods.filter(mod => mod.character === unit.data.base_id).length);
 		const modsPower = 750 * unitMods;
 		return unit.data.power - modsPower;
+	},
+	compareProgress: function(existingData, newData) {
+		const previous = existingData[0];
+		newData.forEach(player => {
+			const prev = previous.find(prevPlayer => prevPlayer.name === player.name);
+			player.kyloDif = prev ? player.kyloProgress - prev.kyloProgress : player.kyloProgress;
+			player.reyDif = prev ? player.reyProgress - prev.reyProgress : player.reyProgress;
+		});
+		return newData;
 	}
 };
 

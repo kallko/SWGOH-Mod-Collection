@@ -43,6 +43,7 @@ const brazzers = [
   { id: 418175181, name: "Smersh" },
   { id: 218624793, name: "CalvinKlein" },
   { id: 259674128, name: "Anthony Trenor" },
+  { id: 742589523, name: "rondorf" },
 ];
 
 module.exports = brazzers;

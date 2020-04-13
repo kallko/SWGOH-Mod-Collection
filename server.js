@@ -8,6 +8,7 @@ const loadData = require('./server/RequestsforGG');
 const GUILD = require('./data/brazzers');
 const characters = require('./data/characters');
 const modsController = require('./server/modsController');
+const readWriteServic = require('./server/service/readWriteService');
 const guildController = require('./server/guildController');
 const legendCharacterController = require('./server/controller/legendCharacterController');
 const verificationController = require('./server/verificationController');
@@ -26,8 +27,6 @@ init();
 async function init () {
 	// HEROES = JSON.parse(JSON.stringify(characters));
 	HEROES = await loadData.getAllHeroes();
-
-
 	// todo for testing run mod constructor for one persone:
 	// const options = require ('./data/setModeOptions');
 	// let result = verificationController.verificateModConstructorOptions(options, HEROES);
@@ -35,7 +34,7 @@ async function init () {
 	// const options2 = require ('./data/modEtalon');
 	// await modsController.creator(options2, 621723826);
 
-	// todoCreate squads and top lists
+	// todo Create squads and top lists
 	// const result3 = await guildController.createSquads();
 
 	// const result2 = await modsController.creator(options, 452867287);
