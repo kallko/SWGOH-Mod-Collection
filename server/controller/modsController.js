@@ -1,9 +1,9 @@
-const MOD = require ('../data/mod');
-const tritonMods = require ('../data/tritonMods');
-const triton = require ('../data/triton');
-const GUILD = require ('../data/brazzers');
-const STATS = require ('../data/stats');
-const loadData = require ('./RequestsforGG');
+const MOD = require('../../data/mod');
+const tritonMods = require('../../data/tritonMods');
+const triton = require('../../data/triton');
+const GUILD = require('../../data/brazzers');
+const STATS = require('../../data/stats');
+const loadData = require('../service/RequestsforGG');
 const lodash = require('lodash');
 let currentSecondary = 'test';
 let currentUnit = 'test';
@@ -28,21 +28,21 @@ const modsController = (module.exports =  {
 				unit.data.mods.forEach(mod => {
 					let point = '';
 					if (mod.tier === 1 && mod.rarity < 6) {
-						point+= ' White mode presents in ' + MOD.form[mod.slot] + ' ';
+						point += ' White mode presents in ' + MOD.form[mod.slot] + ' ';
 					}
 					if (mod.level < 15) {
-						point+= ' Mod level < 15' + (point ? '' :(' in ' + MOD.form[mod.slot]));
+						point += ' Mod level < 15' + (point ? '' : (' in ' + MOD.form[mod.slot]));
 					}
 					if (mod.slot !== 2 && !mod.secondary_stats.some(sstat => sstat.name === 'Speed')) {
-						point+= ' Mod without speed' + (point ? '' :(' in ' + MOD.form[mod.slot]));
+						point += ' Mod without speed' + (point ? '' : (' in ' + MOD.form[mod.slot]));
 					}
 					if (point) {
 						addPoint(upgrades, name, point);
 					}
-				})
+				});
 			}
 			const brokenSet = modSetBroken(unit.data.mods);
-			if (brokenSet){
+			if (brokenSet) {
 				brokenSet.forEach(modSet => {
 					addPoint(upgrades, name, (' ' + modSet + ' is broken'));
 				});
@@ -84,7 +84,7 @@ const modsController = (module.exports =  {
 					if (mod.slot !== 2) {
 						addModForFarming(unit, mod, fleet, arena, settings, index);
 					}
-				})
+				});
 			}
 		});
 		return settings.sets;
@@ -95,7 +95,7 @@ const modsController = (module.exports =  {
 		if (allyCode) {
 			members = members.filter(member => member.id === parseInt(allyCode));
 		}
-		if (members.length === 0){
+		if (members.length === 0) {
 			members.push({
 				id: allyCode,
 				name: 'Some Player'
@@ -104,8 +104,7 @@ const modsController = (module.exports =  {
 		console.log('Members ', members);
 		for (let i = 0; i < members.length; i++) {
 			let mods = await loadData.getAllMods(members[i].id);
-			const bestModsCount = mods.filter(mod => mod.secondary_stats.some
-			(second => second.name === 'Speed' && second.value / 10000 >= 20)).length;
+			const bestModsCount = mods.filter(mod => mod.secondary_stats.some(second => second.name === 'Speed' && second.value / 10000 >= 20)).length;
 			mods = mods.filter(mod => mod.rarity === 5 && mod.slot !== 2);
 			mods = mods.filter(mod =>  {
 				const minSpeed = MOD.speedForUpgrade[mod.tier];
@@ -115,14 +114,16 @@ const modsController = (module.exports =  {
 			result.push({
 				name: members[i].name,
 				bestModsCount: bestModsCount,
-				mods: mods.map((mod) => {return {
+				mods: mods.map((mod) => {
+return {
 					character: mod.character,
 					slot: MOD.form[mod.slot],
 					tier: mod.tier
-				}})
-			})
+				};
+})
+			});
 		}
-		return result
+		return result;
 	},
 	creator: async function (options, id) {
 		let result = {};
@@ -152,18 +153,18 @@ const modsController = (module.exports =  {
 					case 'Critical Chance':
 					{
 						baseStat = (existStat - secondary[secondaryName].additionalSecondary) /
-							(1 + secondary[secondaryName].additionalSecondaryPercent/100 + secondary[secondaryName].secondaryFromSet/100);
+							(1 + secondary[secondaryName].additionalSecondaryPercent / 100 + secondary[secondaryName].secondaryFromSet / 100);
 					break;
 					}
 					case 'Defense': {
-						baseStat = (existStat - secondary[secondaryName].additionalSecondaryPercent - secondary[secondaryName].additionalSecondary/10);
+						baseStat = (existStat - secondary[secondaryName].additionalSecondaryPercent - secondary[secondaryName].additionalSecondary / 10);
 						break;
 					}
 					case 'Critical Damage': {
 						if (secondaryName === 'Critical Damage' && unit.data.base_id === 'JOLEEBINDO') {
-							console.log('inside', existStat, ' ', secondary[secondaryName].additionalSecondary/100, ' ', secondary[secondaryName].secondaryFromSet/100);
+							console.log('inside', existStat, ' ', secondary[secondaryName].additionalSecondary / 100, ' ', secondary[secondaryName].secondaryFromSet / 100);
 						}
-						baseStat = existStat - secondary[secondaryName].additionalSecondaryPercent/100 - secondary[secondaryName].secondaryFromSet/100;
+						baseStat = existStat - secondary[secondaryName].additionalSecondaryPercent / 100 - secondary[secondaryName].secondaryFromSet / 100;
 						break;
 					}
 					default: {
@@ -199,12 +200,10 @@ const modsController = (module.exports =  {
 				possibleMods = possibleMods.filter(mod => mod.rarity >= 5);
 
 
-
 				let bestMods = {};
 				forms.forEach((form, index) => {
 					if (form in hero) {
-						possibleMods = possibleMods.filter
-						(mod => (mod.slot !== index + 1 || (mod.slot === index + 1 && hero[form].some(spec => spec === mod.primary_stat.name)) ));
+						possibleMods = possibleMods.filter(mod => (mod.slot !== index + 1 || (mod.slot === index + 1 && hero[form].some(spec => spec === mod.primary_stat.name)) ));
 					}
 
 					let temp = possibleMods.filter((mod) => mod.slot === index + 1);
@@ -216,7 +215,7 @@ const modsController = (module.exports =  {
 						currentUnit = null;
 					}
 					temp.sort(sortBySpeed);
-					if (temp.length > 3 ){
+					if (temp.length > 3 ) {
 						temp = cutBestMods(temp);
 					}
 					bestMods[form] = [].concat(temp);
@@ -236,19 +235,19 @@ const modsController = (module.exports =  {
 						'Damage', unit.data.stats['6'], '/', Math.round(unit.data.newOffense),
 						'Potency', Math.round(unit.data.stats['17'] * 100), '/', Math.round(unit.data.newPotency * 100),
 						'C-Chance',  Math.round(unit.data.stats['14']), '/', Math.round(unit.data['newCritical Chance']),
-						'C-Damage', Math.round(unit.data.stats['16'] * 100)/100, '/', Math.round(unit.data['newCritical Damage'] * 100)/100);
+						'C-Damage', Math.round(unit.data.stats['16'] * 100) / 100, '/', Math.round(unit.data['newCritical Damage'] * 100) / 100);
 					bestModsForUnit.forEach(mod => {
 						let emod = existingMods.find(eMod => eMod.id === mod.id);
 						if (emod.character !== hero.name) {
 							//todo !comment for result
-							const identifikator = mod.secondary_stats[0].name + ' ' + (('' + mod.secondary_stats[0].value).indexOf('0000') !== -1 ? mod.secondary_stats[0].value / 10000 : Math.round(mod.secondary_stats[0].value)/ 100 + '%');
+							const identifikator = mod.secondary_stats[0].name + ' ' + (('' + mod.secondary_stats[0].value).indexOf('0000') !== -1 ? mod.secondary_stats[0].value / 10000 : Math.round(mod.secondary_stats[0].value) / 100 + '%');
 							const set = MOD.sets.find(mmm => mmm.id === mod.set);
 							// console.log('MOD ', MOD.form[mod.slot], ' from ', emod.character);
-							//todo uncomment for info:
-						// 	console.log('MOD ', MOD.form[mod.slot], ' from ', emod.character, 'SET:', set.name,
-						// 		'Prime:', mod.primary_stat.name + ': ' + (('' + mod.primary_stat.value).indexOf('0000') !== -1 ? mod.primary_stat.value / 10000 : Math.round(mod.primary_stat.value) / 100 + '%'),
-						// 		'Second:', identifikator,
-						// 		'tier', mod.tier, 'rarity', mod.rarity);
+							//todo comment uncomment for info:
+							console.log('MOD ', MOD.form[mod.slot], ' from ', emod.character, 'SET:', set.name,
+								'Prime:', mod.primary_stat.name + ': ' + (('' + mod.primary_stat.value).indexOf('0000') !== -1 ? mod.primary_stat.value / 10000 : Math.round(mod.primary_stat.value) / 100 + '%'),
+								'Second:', identifikator,
+								'tier', mod.tier, 'rarity', mod.rarity);
 						}
 					});
 				}
@@ -274,14 +273,14 @@ const modsController = (module.exports =  {
 			let niceSpeed = speedStat ? speedStat.value >= niceSpeedValue : false;
 			return mod.character === '' && mod.slot !== 2 && niceSpeed;
 		});
-		console.log('We left behind ', leftMods.length, ' mods with speed ', niceSpeedValue/10000 + '+');
+		console.log('We left behind ', leftMods.length, ' mods with speed ', niceSpeedValue / 10000 + '+');
 		currentSecondary = null;
 		leftMods.sort(sortBySpeed);
 		MOD.sets.forEach(set => {
 			let quant = leftMods.filter(mod => mod.set === set.id).length;
 			console.log('For set ', set.name, ' we lost ', quant, ' mods');
 		});
-		return result
+		return result;
 	}
 });
 
@@ -320,35 +319,35 @@ function addModForFarming(unit, mod, fleet, arena, settings, index) {
 	if ((mod.primary_stat.name !== 'Speed' && unit.data.name !== 'GRIEVOUS')
 		|| (mod.primary_stat.name === 'Speed'
 			&& mod.primary_stat.value < 300000)) {
-		return set.count+= limit.important
+		return set.count += limit.important;
 	}
 	const additionalSpeed = mod.secondary_stats.find(sstat => sstat.name === 'Speed');
-	if (!additionalSpeed){
-		return set.count+= (limit.important + 1);
+	if (!additionalSpeed) {
+		return set.count += (limit.important + 1);
 	}
 	if (additionalSpeed.value / 10000 < limit.minimum) {
-		return set.count+= limit.important;
+		return set.count += limit.important;
 	}
 }
 
 function getHeroRank(unit, fleet, arena, index) {
 	if (arena.some(hero => unit.data.base_id ===  hero)) {
-		return 'arena'
+		return 'arena';
 	}
 	if (fleet.some(hero => unit.data.base_id ===  hero)) {
-		return 'fleet'
+		return 'fleet';
 	}
 	if (index < 50) {
-		return 'best'
+		return 'best';
 	}
-	return 'rest'
+	return 'rest';
 }
 
 function modSetBroken(mods) {
 	let result = [];
 	MOD.sets.forEach(set => {
 		const realCount = mods.filter(mod => mod.set === set.id).length;
-		if (realCount && (realCount < set.setCount || (realCount%set.setCount !== 0))) {
+		if (realCount && (realCount < set.setCount || (realCount % set.setCount !== 0))) {
 			result.push(set.name);
 		}
 	});
@@ -356,7 +355,7 @@ function modSetBroken(mods) {
 }
 
 function sortByTier(first, second) {
-	return second.tier - first.tier
+	return second.tier - first.tier;
 }
 
 function sortBySpeed(first, second) {
@@ -398,17 +397,17 @@ function modVariator(hero, mods, secondary, unit, possibleSets) {
 							const mods = [mSquare, mArrow, mRomb, mTriangle, mCircle, mCross];
 							if (!hero.completeSets || (hero.completeSets && completeSets)) {
 								const speed = getSpeed([mSquare, mArrow, mRomb, mTriangle, mCircle, mCross]);
-								const withNewSetSpeed = Math.round(unit.data.speed.baseSpeed * (1 + speed.speedFromSet/100) + speed.additionalSpeed);
+								const withNewSetSpeed = Math.round(unit.data.speed.baseSpeed * (1 + speed.speedFromSet / 100) + speed.additionalSpeed);
 								if (withNewSetSpeed > bestSpeed ) {
 									bestSpeed = withNewSetSpeed;
 									result = mods;
 								}
 							}
-						})
-					})
-				})
-			})
-		})
+						});
+					});
+				});
+			});
+		});
 	});
 	result.push(bestSpeed);
 	return result;
@@ -425,15 +424,12 @@ function isCompleteSets({mSquare, mArrow, mRomb, mTriangle, mCircle, mCross}, po
 		const modSetExistCount = modSets.filter(mss => mss === set).length;
 		if (modSetExistCount % setCount !== 0) {
 			result = false;
-		} else {
-			if (!existSets.some(eSet => eSet === setName)) {
+		} else if (!existSets.some(eSet => eSet === setName)) {
 				existSets.push(setName);
 			}
-		}
 
 	});
-	if (!possibleSets.every(es => existSets.some(ps => ps === es)))
-	{
+	if (!possibleSets.every(es => existSets.some(ps => ps === es))) {
 		return false;
 	}
 	return result;
@@ -450,13 +446,13 @@ function getSpeed(mods) {
 		}
 		return summ + addPrimeSpeed + addSecSpeed;
 	}, 0);
-	if (mods.filter(mod => mod.set === 4 && mod.level >=1).length >= 4) {
+	if (mods.filter(mod => mod.set === 4 && mod.level >= 1).length >= 4) {
 		speedFromSet = 5;
 		if (mods.filter(mod => mod.set === 4 && mod.level === 15).length >= 4) {
-			speedFromSet = 10
+			speedFromSet = 10;
 		}
 	}
-	return {additionalSpeed, speedFromSet}
+	return {additionalSpeed, speedFromSet};
 }
 
 function getExistingSpeed(mods, unit) {
@@ -464,8 +460,8 @@ function getExistingSpeed(mods, unit) {
 	const heroMods = mods.filter(mod => mod.character === name);
 	const speed = getSpeed(heroMods, name);
 	const existingSpeed = unit.data.stats['5'];
-	const baseSpeed = Math.round((existingSpeed - speed.additionalSpeed)/(1 + speed.speedFromSet/100));
-	return {existingSpeed, baseSpeed}
+	const baseSpeed = Math.round((existingSpeed - speed.additionalSpeed) / (1 + speed.speedFromSet / 100));
+	return {existingSpeed, baseSpeed};
 }
 
 function getExistingSecondary(mods, unit) {
@@ -477,9 +473,9 @@ function getExistingSecondary(mods, unit) {
 function getSecondary(mods, secondary) {
 	const primaryStat = mods.reduce((sum, mod) =>{
 		if (mod.primary_stat.name === secondary) {
-			sum += mod.primary_stat.value/100;
+			sum += mod.primary_stat.value / 100;
 		}
-		return sum
+		return sum;
 	}, 0);
 	let secondaryStat = {
 		add: 0,
@@ -487,10 +483,10 @@ function getSecondary(mods, secondary) {
 	};
 	mods.forEach(mod => mod.secondary_stats.forEach(ss => {
 		if (ss.name === secondary) {
-			if (ss.value > 10000){
-				secondaryStat.add += ss.value/10000;
+			if (ss.value > 10000) {
+				secondaryStat.add += ss.value / 10000;
 			} else {
-				secondaryStat.percent += ss.value/100
+				secondaryStat.percent += ss.value / 100;
 			}
 		}
 	}));
@@ -520,11 +516,11 @@ function getSecondary(mods, secondary) {
  function getSecondarySet(mods, name, secondary) {
 	 let additionalSecondaryPercent = 0;
 	 let additionalSecondary = 0;
-	 const addPrimeSecondaryPercent = mods.reduce((summ ,mod) => {
+	 const addPrimeSecondaryPercent = mods.reduce((summ, mod) => {
 	 	if (mod.primary_stat.name === secondary) {
 	 		if (secondary === 'Defense') {
 				additionalSecondary += mod.primary_stat.value / 100;
-	 			return summ
+	 			return summ;
 			} else {
 				return summ + mod.primary_stat.value / 100;
 			}
@@ -537,7 +533,7 @@ function getSecondary(mods, secondary) {
 				 if (ss.value % 10000 === 0) {
 					 additionalSecondary += ss.value / 10000;
 				 } else {
-					 additionalSecondaryPercent += ss.value / 100
+					 additionalSecondaryPercent += ss.value / 100;
 				 }
 			 }
 		 });
@@ -548,7 +544,7 @@ function getSecondary(mods, secondary) {
 	 if (!set) {
 		 return {[secondary]:
 				 {additionalSecondaryPercent, additionalSecondary, secondaryFromSet: 0}
-		 }
+		 };
 	 }
 	 const setCount = set.setCount;
 	 const setId = set.id;
@@ -556,14 +552,14 @@ function getSecondary(mods, secondary) {
 	 const fullModInSet = mods.filter(mod => mod.set === setId && mod.level === 15).length;
 	 const modInSet = mods.filter(mod => mod.set === setId && mod.level < 15).length;
 
-	 const secondaryFromSet = (fullModInSet/setCount | 0) * setBonus + (((fullModInSet + modInSet) / setCount | 0) - (fullModInSet/setCount | 0)) * setBonus / 2;
+	 const secondaryFromSet = (fullModInSet / setCount | 0) * setBonus + (((fullModInSet + modInSet) / setCount | 0) - (fullModInSet / setCount | 0)) * setBonus / 2;
 	 if (secondary === 'Speed') {
-		 additionalSecondary += additionalSecondaryPercent/100;
+		 additionalSecondary += additionalSecondaryPercent / 100;
 		 additionalSecondaryPercent = 0;
 	 }
 	 return {[secondary]:
 			 {additionalSecondaryPercent, additionalSecondary, secondaryFromSet}
-		}
+		};
  }
  function getAdditionalSecondaryForUnit(mod) {
 	let result = 0;
@@ -579,20 +575,20 @@ function getSecondary(mods, secondary) {
 			let addPercent = 0;
 			addSecondaryStats.forEach(stat => {
 				if (stat.value % 10000 === 0) {
-					add += stat.value / 10000
+					add += stat.value / 10000;
 				} else {
 					addPercent += stat.value / 100;
 				}
 			});
 			if (mod.primary_stat.name === currentSecondary) {
 				if (mod.primary_stat.value % 10000 === 0) {
-					add += mod.primary_stat.value / 10000
+					add += mod.primary_stat.value / 10000;
 				} else {
 					addPercent += mod.primary_stat.value / 100;
 				}
 			}
 
-			result = baseStat + add + (baseStat * addPercent/100);
+			result = baseStat + add + (baseStat * addPercent / 100);
 			break;
 		}
 		case 'Potency':
@@ -601,10 +597,10 @@ function getSecondary(mods, secondary) {
 			{
 				let secondaryStat = mod.secondary_stats.find(ss => ss.name === currentSecondary);
 				if (secondaryStat) {
-					result = baseStat + secondaryStat.value /100;
+					result = baseStat + secondaryStat.value / 100;
 				}
 				if (mod.primary_stat.name === currentSecondary) {
-					result += mod.primary_stat.value/100;
+					result += mod.primary_stat.value / 100;
 				}
 				break;
 			}
@@ -618,7 +614,7 @@ function getSecondary(mods, secondary) {
  function calculateNewStats(unit, mods) {
 	['Health', 'Protection', 'Offense', 'Critical Chance', 'Critical Damage', 'Potency'].forEach(secondary => {
 		let additional = getSecondarySet(mods, '', secondary)[secondary];
-		let addPercent = secondary === 'Critical Damage' ? 1 : unit.data['base'+ secondary];
-		unit.data['new'+ secondary] = unit.data['base'+ secondary] + additional.additionalSecondary + addPercent * additional.additionalSecondaryPercent/100 + addPercent * additional.secondaryFromSet/100;
+		let addPercent = secondary === 'Critical Damage' ? 1 : unit.data['base' + secondary];
+		unit.data['new' + secondary] = unit.data['base' + secondary] + additional.additionalSecondary + addPercent * additional.additionalSecondaryPercent / 100 + addPercent * additional.secondaryFromSet / 100;
 	});
  }

@@ -10,4 +10,13 @@ router.route('/')
         }
     });
 
+router.route('/api')
+	.get(function (req, res) {
+		try {
+			res.json({test: true});
+		} catch (e) {
+			consol.log( "ERROR " + e + e.stack);
+		}
+	});
+
 module.exports = router;

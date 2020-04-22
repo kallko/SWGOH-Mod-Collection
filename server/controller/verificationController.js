@@ -1,4 +1,4 @@
-const MOD = require ('../data/mod');
+const MOD = require ('../../data/mod');
 
 
 

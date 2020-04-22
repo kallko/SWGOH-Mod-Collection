@@ -7,11 +7,13 @@ module.exports = printService = {
 		results.forEach((result, index) => console.log(printService.createLineForLegendReyProgress(index, result)));
 	},
 	createLineForLegendKyloProgress: function (index, player) {
-		let result = '' + (index + 1) + ' ' + player.name + ' ' + player.kyloProgress + '%' + ' (+' + player.kyloDif + '%)';
+		const kRelic = player.existRelic.kyloReq;
+		let result = '' + (index + 1) + ' ' + player.name + ' ' + player.kyloProgress + '%' + ' (+' + player.kyloDif + '%) ' + kRelic.fragment + '/' + kRelic.partial + '/' + kRelic.broken;
 		return result;
 	},
 	createLineForLegendReyProgress: function (index, player) {
-		let result = '' + (index + 1) + ' ' + player.name + ' ' + player.reyProgress + '%' + ' (+' + player.reyDif + '%)';
+		const rRelic = player.existRelic.reyReq;
+		let result = '' + (index + 1) + ' ' + player.name + ' ' + player.reyProgress + '%' + ' (+' + player.reyDif + '%) ' + rRelic.fragment + '/' + rRelic.partial + '/' + rRelic.broken;
 		return result;
 	}
 };

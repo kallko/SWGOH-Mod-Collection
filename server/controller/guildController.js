@@ -1,10 +1,10 @@
-const MOD = require ('../data/mod');
-const tritonMods = require ('../data/tritonMods');
-const triton = require ('../data/triton');
-const GUILD = require ('../data/brazzers');
-const STATS = require ('../data/stats');
-const SQUADS = require ('../data/squads');
-const loadData = require ('./RequestsforGG');
+const MOD = require ('../../data/mod');
+const tritonMods = require ('../../data/tritonMods');
+const triton = require ('../../data/triton');
+const GUILD = require ('../../data/brazzers');
+const STATS = require ('../../data/stats');
+const SQUADS = require ('../../data/squads');
+const loadData = require ('../service/RequestsforGG');
 const lodash = require('lodash');
 let currentSecondary = 'test';
 let currentUnit = 'test';

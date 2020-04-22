@@ -4,16 +4,16 @@ const express = require('express');
     const io = require('socket.io')(server);
 
 app.use(express.static(__dirname + '/public'));
-const loadData = require('./server/RequestsforGG');
+const loadData = require('./server/service/RequestsforGG');
 const GUILD = require('./data/brazzers');
 const characters = require('./data/characters');
-const modsController = require('./server/modsController');
+const modsController = require('./server/controller/modsController');
 const readWriteServic = require('./server/service/readWriteService');
-const guildController = require('./server/guildController');
+const guildController = require('./server/controller/guildController');
 const legendCharacterController = require('./server/controller/legendCharacterController');
-const verificationController = require('./server/verificationController');
+const verificationController = require('./server/controller/verificationController');
 const router = require('./server/serverRouter');
-      const port = 1976;
+      const port = 3128;
 
 app.use('/', router);
 server.listen(port);
@@ -28,9 +28,9 @@ async function init () {
 	// HEROES = JSON.parse(JSON.stringify(characters));
 	HEROES = await loadData.getAllHeroes();
 	// todo for testing run mod constructor for one persone:
-	// const options = require ('./data/setModeOptions');
-	// let result = verificationController.verificateModConstructorOptions(options, HEROES);
-	// await modsController.creator(options, 621723826);
+	const options = require ('./data/setModeOptions');
+	let result = verificationController.verificateModConstructorOptions(options, HEROES);
+	await modsController.creator(options, 621723826);
 	// const options2 = require ('./data/modEtalon');
 	// await modsController.creator(options2, 621723826);
 
@@ -42,7 +42,7 @@ async function init () {
 	// const result2 = await modsController.creator(options, 347317671);
 	// console.log('Errors', result);
 	//todo check guild progress to legend
-	legendCharacterController.checkGuild();
+	// legendCharacterController.checkGuild();
 }
 
 

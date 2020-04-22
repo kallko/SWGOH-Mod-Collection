@@ -50,7 +50,7 @@ const options =
 				arrow:['Speed'],
 				cross:['Potency'],
 				triangle: ['Protection', 'Health'],
-				circle: ['Protection', 'Health'],
+				circle: ['Health'],
 				secondary: 'Potency'
 			},
 			{
@@ -136,6 +136,22 @@ const options =
 				secondary: 'Health',
 			},
 			{
+				name: 'HANSOLO',
+				possibleSets: ['Critical Damage', 'Health'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Critical Chance',
+				triangle: ['Critical Damage'],
+			},
+			{
+				name: 'CHEWBACCALEGENDARY',
+				possibleSets: ['Critical Chance', 'Speed'],
+				completeSets: true,
+				arrow:['Speed'],
+				secondary: 'Potency',
+				cross: ['Potency'],
+			},
+			{
 				name: 'CLONESERGEANTPHASEI',
 				possibleSets: ['Critical Damage', 'Health'],
 				completeSets: true,
@@ -164,23 +180,6 @@ const options =
 				arrow:['Speed'],
 				secondary: 'Protection',
 			},
-			{
-				name: 'HANSOLO',
-				possibleSets: ['Critical Damage', 'Health'],
-				completeSets: true,
-				arrow:['Speed'],
-				secondary: 'Critical Chance',
-				triangle: ['Critical Damage'],
-			},
-			{
-				name: 'CHEWBACCALEGENDARY',
-				possibleSets: ['Critical Chance', 'Speed'],
-				completeSets: true,
-				arrow:['Speed'],
-				secondary: 'Potency',
-				cross: ['Potency'],
-			},
-
 			{
 				name: 'GEONOSIANBROODALPHA',
 				possibleSets: ['Speed', 'Critical Chance'],
@@ -582,7 +581,7 @@ const options =
 
 		],
 	blockedHeroes: [
-		// 'ADMIRALACKBAR',
+		'ADMIRALACKBAR',
 		// 'GENERALKENOBI'
 	]}
 ;
